@@ -11,5 +11,10 @@
   },
   "dependencies": {
     "sst": "^3"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/tfcbot/cursor-full-stack-template.git",
+  "author": "tfcbot <admin@blurware.com>",
+  "license": "MIT",
+  "private": true
 }
