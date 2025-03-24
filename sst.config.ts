@@ -3,18 +3,16 @@
 export default $config({
   app(input) {
     return {
-      name: "monorepo-template",
+      name: "cfs-template",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "aws",
     };
   },
   async run() {
-    const storage = await import("./infra/storage");
-    await import("./infra/api");
-
+    const infra = await import("./infra");
     return {
-      MyBucket: storage.bucket.name,
+      url: infra.frontend.url,
     };
   },
 });
