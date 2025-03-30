@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-template/core",
+  "name": "@cursor-full-stack-template/core",
   "type": "module",
   "version": "0.0.0",
   "scripts": {
@@ -12,6 +12,10 @@
     ]
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.777.0",
+    "@aws-sdk/client-sns": "^3.777.0",
+    "@aws-sdk/lib-dynamodb": "^3.778.0",
+    "openai": "^4.90.0",
     "sst": "*"
   },
   "devDependencies": {

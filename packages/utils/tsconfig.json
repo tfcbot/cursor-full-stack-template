@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+      "paths": {
+        "@agent-runtime/*": ["../../packages/core/src/features/*"], 
+        "@orchestrator/*": ["../../packages/core/src/orchestrator/*"],
+        "@metadata/*": ["../../packages/core/src/metadata/*"],
+        "@utils/*": ["../../packages/utils/src/*"],
+      },
+  },
+  "include": ["src/**/*", "test/**/*", "sst-env.d.ts"]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "monorepo-template",
+  "name": "cursor-full-stack-template",
   "version": "0.0.0",
   "workspaces": [
     "packages/*"
@@ -10,7 +10,9 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "sst": "^3"
+    "aws-lambda": "^1.0.7",
+    "sst": "^3",
+    "zod": "^3.24.2"
   },
   "main": "index.js",
   "repository": "https://github.com/tfcbot/cursor-full-stack-template.git",

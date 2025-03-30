@@ -3,5 +3,21 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-  },
+      "baseUrl": ".",
+      "paths": {
+        "@services/*": ["src/services/*"],
+        "@agent-runtime/*": ["src/orchestrator/agent-runtime/*"],
+        "@metadata/*": ["src/metadata/*"],
+        "@lib/*": ["src/lib/*"],
+        "@utils/*": ["../../packages/utils/src/*"],
+      }, 
+     //"esModuleInterop": true
+    }, 
+    "include": [
+      "**/*.test.ts", 
+      "**/*.ts",    
+      "src/**/*", 
+      "test/**/*", 
+      "sst-env.d.ts"
+    ]
 }

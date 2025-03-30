@@ -1,7 +1,36 @@
-import { bucket } from "./storage";
+import { 
+    contentTable
+ } from "./database";
+import { 
+  secrets,
+ } from "./secrets";
+import { AgentTopic } from "./topic";
 
-export const myApi = new sst.aws.Function("MyApi", {
-  url: true,
-  link: [bucket],
-  handler: "packages/functions/src/api.handler"
-});
+
+export const api = new sst.aws.ApiGatewayV2('BackendApi')
+
+
+const topics = [AgentTopic]
+const tables = [contentTable]
+
+
+const apiResources = [
+  ...topics,
+  ...tables,
+  ...secrets,
+]
+
+
+api.route("GET /content", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.contentHandler",
+})
+
+
+api.route("POST /content", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.contentHandler",
+})
+
+
+
