@@ -1,11 +1,11 @@
 import OpenAI from "openai";
-import { ContentRequestInput ,userPromt, ContentRequestOutputSchema, ContentRequestOutput, systemPromptSchema } from "@metadata/agents/content-agent.schema";
+import { ContentRequestInput ,userPromt, ContentRequestOutputSchema, ContentRequestOutput, systemPromptSchema } from "../../../../../../../metadata/agents/content-agent.schema";
 import { Resource } from "sst";
 import { withRetry } from "@utils/tools/retry";
 import { zodToOpenAIFormat } from "@utils/vendors/openai/schema-helpers";
 
 const client = new OpenAI({
-  apiKey: Resource.OpenAIApiKey.value
+  apiKey: Resource.OpenAiApiKey.value
 });
 
 export const createContent = async (input: ContentRequestInput): Promise<ContentRequestOutput> => {

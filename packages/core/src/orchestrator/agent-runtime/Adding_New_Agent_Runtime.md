@@ -259,7 +259,7 @@ import { withRetry } from "@utils/tools/retry";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 const client = new OpenAI({
-  apiKey: Resource.OpenAIApiKey.value
+  apiKey: Resource.OpenAiApiKey.name
 });
 
 export const run<YOUR-AGENT-NAME> = async (input: Request<YOUR-AGENT-NAME>Input): Promise<Deliverable> => {

@@ -1,8 +1,8 @@
-import { ContentRequestInput } from '@metadata/agents/content-agent.schema';
+import { RequestContentInput } from '@metadata/agents/content-agent.schema';
 import { runContent } from '@agent-runtime/content-generator/adapters/secondary/openai.adapter';
-import { Message } from '@utils/metadata/message.schema';
+import { Message } from '@metadata/message.schema';
 
-export const createContentUsecase = async (input: ContentRequestInput): Promise<Message> => {
+export const createContentUsecase = async (input: RequestContentInput): Promise<Message> => {
   console.info("Creating content for User");
 
   try {

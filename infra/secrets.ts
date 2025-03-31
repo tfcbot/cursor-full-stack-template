@@ -1,3 +1,3 @@
-const openaiApiKey = new sst.Secret("OpenAIApiKey")
+const openaiApiKey = new sst.Secret("OpenAiApiKey")
 
 export const secrets = [openaiApiKey]

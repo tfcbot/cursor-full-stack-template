@@ -4,7 +4,6 @@ import { JwtPayload } from '@clerk/types';
 
 export const ValidUserSchema = z.object({
   userId: z.string(),
-  keyId: z.string(),
 });
 
 export const MessageSchema = z.object({

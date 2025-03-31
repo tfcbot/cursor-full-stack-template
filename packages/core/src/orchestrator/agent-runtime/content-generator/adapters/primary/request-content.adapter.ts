@@ -12,10 +12,10 @@ import {
     LambdaAdapterOptions,
     GetUserInfo
   } from '@lib/lambda-adapter.factory';
-import { ContentRequestInputSchema, ContentRequestInput } from "@metadata/agents/content-agent.schema";
+import { RequestContentInputSchema, RequestContentInput } from "@metadata/agents/content-agent.schema";
 import { OrchestratorHttpResponses } from '@metadata/http-responses.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { ValidUser } from '@utils/metadata/saas-identity.schema';
+import { ValidUser } from '@metadata/saas-identity.schema';
 import { Topic } from '@metadata/orchestrator.schema';
 import { Queue } from '@metadata/orchestrator.schema';
 import { topicPublisher } from '@lib/topic-publisher.adapter';
@@ -26,7 +26,7 @@ import { topicPublisher } from '@lib/topic-publisher.adapter';
  * expected by the content generation use case.
  * The validUser parameter contains the user information returned by getContentUserInfo.
  */
-const contentEventParser: EventParser<ContentRequestInput> = (
+const contentEventParser: EventParser<RequestContentInput> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
@@ -37,7 +37,7 @@ const contentEventParser: EventParser<ContentRequestInput> = (
   const parsedBody = JSON.parse(event.body);
   
 
-  const parsedBodyWithIds = ContentRequestInputSchema.parse({
+  const parsedBodyWithIds = RequestContentInputSchema.parse({
     ...parsedBody,
     ...validUser,
     orderId: randomUUID(),
@@ -53,7 +53,7 @@ const contentEventParser: EventParser<ContentRequestInput> = (
  * Configuration options for the content generation adapter
  */
 const contentAdapterOptions: LambdaAdapterOptions = {
-  requireAuth: true,
+  requireAuth: false,
   requireBody: true,
   requiredFields: ['prompt', 'contentType']
 };
@@ -64,7 +64,7 @@ const contentAdapterOptions: LambdaAdapterOptions = {
  * The input parameter will contain the complete request object returned by contentEventParser,
  * which includes the user information from getContentUserInfo.
  */
-const publishMessageUsecase = async (input: ContentRequestInput) => {
+const publishMessageUsecase = async (input: RequestContentInput) => {
   topicPublisher.publishAgentMessage({
     topic: Topic.agent,
     queue: Queue.content,
@@ -85,7 +85,7 @@ const publishMessageUsecase = async (input: ContentRequestInput) => {
  * 4. Formats and returns the response
  */
 export const requestContentAdapter = createLambdaAdapter({
-  schema: ContentRequestInputSchema,
+  schema: RequestContentInputSchema,
   useCase: publishMessageUsecase,
   eventParser: contentEventParser,
   options: contentAdapterOptions,

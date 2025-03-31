@@ -7,7 +7,7 @@
       "paths": {
         "@services/*": ["src/services/*"],
         "@agent-runtime/*": ["src/orchestrator/agent-runtime/*"],
-        "@metadata/*": ["src/metadata/*"],
+        "@metadata/*": ["../../packages/metadata/*"],
         "@lib/*": ["src/lib/*"],
         "@utils/*": ["../../packages/utils/src/*"],
       }, 
@@ -19,5 +19,5 @@
       "src/**/*", 
       "test/**/*", 
       "sst-env.d.ts"
-    ]
+, "../metadata/agents", "../metadata/credits.schema.ts", "../metadata/http-responses.schema.ts", "../metadata/orchestrator.schema.ts", "../metadata/task.schema.ts", "../metadata/user.schema.ts"    ]
 }

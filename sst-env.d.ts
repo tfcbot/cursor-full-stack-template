@@ -5,6 +5,30 @@
 
 declare module "sst" {
   export interface Resource {
+    "AgentTopic": {
+      "arn": string
+      "type": "sst.aws.SnsTopic"
+    }
+    "BackendApi": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "Content": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "ContentQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "MyWeb": {
+      "type": "sst.aws.Nextjs"
+      "url": string
+    }
+    "OpenAiApiKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
   }
 }
 /// <reference path="sst-env.d.ts" />

@@ -30,7 +30,7 @@ import {
 } from "@utils/metadata/credit.schema";
 
 import { Resource } from "sst";
-import { Message } from "../metadata/message.schema";
+import { Message } from "../../../metadata/message.schema";
 
 export interface IApiKeyRepository {
   getUserDetailsByApiKey(command: GetUserDetailsByApiKeyCommand): Promise<ValidUser>

@@ -23,13 +23,13 @@ const apiResources = [
 
 api.route("GET /content", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.contentHandler",
+  handler: "./packages/functions/src/agent-runtime.api.contentGeneratorHandler",
 })
 
 
 api.route("POST /content", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.contentHandler",
+  handler: "./packages/functions/src/agent-runtime.api.requestContentHandler",
 })
 
 
