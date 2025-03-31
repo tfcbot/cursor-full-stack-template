@@ -1,5 +1,5 @@
 import { 
-    deepResearchTable
+    researchTable
  } from "./database";
 import { 
   secrets,
@@ -11,7 +11,7 @@ export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
 const topics = [AgentTopic]
-const tables = [deepResearchTable]
+const tables = [researchTable]
 
 
 const apiResources = [

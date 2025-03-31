@@ -1,6 +1,6 @@
-export const deepResearchTable = new sst.aws.Dynamo("DeepResearch", {
+export const researchTable = new sst.aws.Dynamo("Research", {
     fields: {
-        deepResearchId: "string"
+        researchId: "string"
     },
-    primaryIndex: {hashKey: "deepResearchId"},
+    primaryIndex: {hashKey: "researchId"},
 })
