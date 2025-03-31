@@ -1,4 +1,4 @@
-import { deepResearchTable } from "./database"
+import { researchTable } from "./database"
 import { secrets } from "./secrets"
 
 
@@ -10,13 +10,13 @@ export const deepResearchQueue = new sst.aws.Queue("DeepResearchQueue")
 deepResearchQueue.subscribe({
     handler: "./packages/functions/src/agent-runtime.api.deepResearchHandler", 
     link: [
-        deepResearchTable, 
+        researchTable, 
         ...secrets, 
     ], 
     permissions: [
         {
             actions: ["dynamodb:*"], 
-            resources: [deepResearchTable.arn]
+            resources: [researchTable.arn]
         }
     ],
 })

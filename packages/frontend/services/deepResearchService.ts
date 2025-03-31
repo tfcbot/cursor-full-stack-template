@@ -2,7 +2,7 @@
 
 import { DeepResearch, DeepResearchRequest } from '../app/api';
 import { MOCK_DEEP_RESEARCH } from './mockData';
-import { apiService } from './agent.service';
+import { getDeepResearch, postDeepResearch } from './agent.service';
 
 const STORAGE_KEY = 'deep-research-generator-data';
 
@@ -33,7 +33,7 @@ const initializeStorage = () => {
 export const getAllDeepResearch = async (): Promise<DeepResearch[]> => {
   // First try to fetch from API
   try {
-    const response = await apiService.getDeepResearch();
+    const response = await getDeepResearch();
     if (response && Array.isArray(response)) {
       return response;
     }
@@ -70,15 +70,12 @@ export const getDeepResearchById = async (id: string): Promise<DeepResearch | nu
 export const addDeepResearch = async (request: DeepResearchRequest): Promise<DeepResearch> => {
   // First try to use the API
   try {
-    const newDeepResearch: DeepResearch = {
-      id: Math.random().toString(36).substring(2, 15),
-      topic: request.topic,
-      content: generateMockDeepResearch(request),
-      createdAt: new Date().toISOString(),
+    const newDeepResearch: DeepResearchRequest = {
+      prompt: generateMockDeepResearch(request),
     };
     
     // Try to post to API
-    const response = await apiService.postDeepResearch(JSON.stringify(newDeepResearch));
+    const response = await postDeepResearch(newDeepResearch);
     
     if (response && response.id) {
       return response;
@@ -95,9 +92,9 @@ export const addDeepResearch = async (request: DeepResearchRequest): Promise<Dee
   try {
     // Generate a new deep research item
     const newDeepResearch: DeepResearch = {
-      id: Math.random().toString(36).substring(2, 15),
-      topic: request.topic,
-      content: generateMockDeepResearch(request),
+      researchId: Math.random().toString(36).substring(2, 15),
+      status: 'pending',
+      prompt: generateMockDeepResearch(request),
       createdAt: new Date().toISOString(),
     };
     
@@ -119,28 +116,34 @@ export const addDeepResearch = async (request: DeepResearchRequest): Promise<Dee
 
 // Helper function to generate mock deep research (in a real app, this would be an API call)
 function generateMockDeepResearch(request: DeepResearchRequest): string {
-  const lengthMap = {
-    short: 2,
-    medium: 4,
-    long: 8,
-  };
+  // Extract the prompt from the request
+  const prompt = request.prompt;
   
-  const toneMap = {
+  // Default values
+  const defaultTone = 'professional';
+  const defaultLength = 'medium';
+  
+  // Define tone descriptions
+  const toneMap: Record<string, string> = {
     casual: 'friendly and conversational',
     professional: 'formal and informative',
     humorous: 'light-hearted and funny',
   };
   
+  // Generate paragraphs
   const paragraphs = [];
-  const paragraphCount = lengthMap[request.length];
+  const paragraphCount = 10;
   
-  paragraphs.push(`This is a ${request.length} in-depth research about "${request.topic}" written in a ${toneMap[request.tone]} tone.`);
+  // Introduction paragraph
+  paragraphs.push(`This is an in-depth research about "${prompt}" written in a ${toneMap[defaultTone]} tone.`);
   
+  // Body paragraphs
   for (let i = 1; i < paragraphCount; i++) {
-    paragraphs.push(`Paragraph ${i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl. ${request.topic} is a fascinating subject that can be thoroughly researched from multiple perspectives.`);
+    paragraphs.push(`Paragraph ${i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nisl aliquet nunc, quis aliquam nisl nunc quis nisl. ${prompt} is a fascinating subject that can be thoroughly researched from multiple perspectives.`);
   }
   
-  paragraphs.push(`In conclusion, ${request.topic} is a complex area worthy of deep exploration. This research aimed to provide a ${request.length} comprehensive analysis in a ${request.tone} style.`);
+  // Conclusion paragraph
+  paragraphs.push(`In conclusion, ${prompt} is a complex area worthy of deep exploration. This research aimed to provide a comprehensive analysis in a ${defaultTone} style.`);
   
   return paragraphs.join('\n\n');
-} 
+}

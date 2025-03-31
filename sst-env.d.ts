@@ -13,11 +13,7 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
-    "Content": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
-    "ContentQueue": {
+    "DeepResearchQueue": {
       "type": "sst.aws.Queue"
       "url": string
     }
@@ -28,6 +24,10 @@ declare module "sst" {
     "OpenAiApiKey": {
       "type": "sst.sst.Secret"
       "value": string
+    }
+    "Research": {
+      "name": string
+      "type": "sst.aws.Dynamo"
     }
   }
 }

@@ -14,7 +14,7 @@ const topics = [AgentTopic]
 const tables = [researchTable]
 
 
-const apiResources = [
+export const apiResources = [
   ...topics,
   ...tables,
   ...secrets,

@@ -4,16 +4,13 @@
 // The actual implementation is in hooks/useDeepResearchHooks.ts
 
 export interface DeepResearchRequest {
-  topic: string;
-  length: 'short' | 'medium' | 'long';
-  tone: 'casual' | 'professional' | 'humorous';
+  prompt: string;
 }
 
 export interface DeepResearch {
-  id: string;
-  topic: string;
-  content: string;
-  createdAt: string;
+  researchId: string;
+  status: string;
+  [key: string]: any;
 }
 
 // Re-export hooks from dedicated hook files
