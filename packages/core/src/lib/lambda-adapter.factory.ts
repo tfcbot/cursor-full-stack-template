@@ -6,7 +6,7 @@
  */
 
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { ValidUser } from '@utils/metadata/saas-identity.schema';
+import { ValidUser } from '@metadata/saas-identity.schema';
 import { createError, handleError } from '@utils/tools/custom-error';
 import { SaaSIdentityVendingMachine } from '@utils/tools/saas-identity';
 import { HttpStatusCode } from '@utils/tools/http-status';
@@ -154,7 +154,7 @@ export const createLambdaAdapter = <
   return async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
     try {
       // Authentication handling
-      let validUser: ValidUser = { userId: '', keyId: '' };
+      let validUser: ValidUser = { userId: '' };
       
       if (options.requireAuth !== false) {
         validUser = await getUserInfo(event);

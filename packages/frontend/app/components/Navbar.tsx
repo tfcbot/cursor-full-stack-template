@@ -11,7 +11,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <Link href="/" className="text-xl font-semibold text-fg-primary">
-            Content Generator
+            Deep Research Generator
           </Link>
         </div>
         
@@ -19,8 +19,8 @@ export function Navbar() {
           <NavLink href="/" active={pathname === '/'}>
             Generate
           </NavLink>
-          <NavLink href="/content" active={pathname === '/content'}>
-            View Content
+          <NavLink href="/deep-research" active={pathname === '/deep-research'}>
+            View Research
           </NavLink>
         </div>
       </div>

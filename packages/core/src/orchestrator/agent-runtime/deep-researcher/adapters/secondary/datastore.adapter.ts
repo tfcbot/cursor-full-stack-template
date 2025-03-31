@@ -1,9 +1,9 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { createContentRepository } from './content.repository';
+import { createDeepResearchRepository } from './research.repository';
 
 // Set up DynamoDB client
 const dynamoDbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 
-export const contentRepository = createContentRepository(dynamoDbClient);
+export const deepResearchRepository = createDeepResearchRepository(dynamoDbClient);

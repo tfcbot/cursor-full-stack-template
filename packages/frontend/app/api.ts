@@ -1,15 +1,15 @@
 'use client';
 
 // Types only - no implementation
-// The actual implementation is in hooks/useContentHooks.ts
+// The actual implementation is in hooks/useDeepResearchHooks.ts
 
-export interface ContentRequest {
+export interface DeepResearchRequest {
   topic: string;
   length: 'short' | 'medium' | 'long';
   tone: 'casual' | 'professional' | 'humorous';
 }
 
-export interface Content {
+export interface DeepResearch {
   id: string;
   topic: string;
   content: string;
@@ -18,7 +18,7 @@ export interface Content {
 
 // Re-export hooks from dedicated hook files
 export { 
-  useGenerateContent, 
-  useAllContent as useGetAllContent, 
-  useContentById as useGetContent 
-} from '../hooks/useContentHooks'; 
+  useGenerateDeepResearch, 
+  useAllDeepResearch as useGetAllDeepResearch, 
+  useDeepResearchById as useGetDeepResearch 
+} from '../hooks/useDeepResearchHooks'; 

@@ -1,7 +1,7 @@
 /**
- * Content Request Adapter
+ * Deep Research Request Adapter
  * 
- * This module provides a Lambda adapter for handling content requests.
+ * This module provides a Lambda adapter for handling deep research requests.
  * It uses the lambda adapter factory to create a standardized Lambda handler
  * with authentication, validation, and error handling.
  */
@@ -13,19 +13,19 @@ import {
   LambdaAdapterOptions 
 } from '@lib/lambda-adapter.factory';
 import { randomUUID } from 'crypto';
-import { RequestContentInput, RequestContentInputSchema } from '@metadata/agents/content-agent.schema';
+import { GetResearchInput, GetResearchInputSchema } from '@metadata/agents/deep-research-agent.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
-import { getContentUsecase } from '@agent-runtime/content-generator/usecases/get-content.usecase';
+import { getResearchUsecase } from '@agent-runtime/deep-researcher/usecase/get-research.usecase';
 
 
 
 
 /**
  * Parser function that transforms the API Gateway event into the format
- * expected by the content use case
+ * expected by the deep research use case
  */
-const contentEventParser: EventParser<RequestContentInput> = (
+const getResearchEventParser: EventParser<GetResearchInput> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
@@ -42,33 +42,34 @@ const contentEventParser: EventParser<RequestContentInput> = (
   
   return {
     userId: validUser.userId,
+    researchId: eventBody.researchId,
     prompt: eventBody.prompt
   };
 };
 
 /**
- * Configuration options for the content adapter
+ * Configuration options for the deep research adapter
  */
-const contentAdapterOptions: LambdaAdapterOptions = {
+const deepResearchAdapterOptions: LambdaAdapterOptions = {
   requireAuth: false,
   requireBody: true,
-  requiredFields: ['prompt']
+  requiredFields: ['researchId']
 };
 
 
 /**
- * Lambda adapter for handling content requests
+ * Lambda adapter for handling deep research requests
  * 
  * This adapter:
  * 1. Validates the request body
  * 2. Parses and validates the input using the schema
- * 3. Executes the content use case
+ * 3. Executes the deep research use case
  * 4. Formats and returns the response
  */
-export const requestContentAdapter = createLambdaAdapter({
-  schema: RequestContentInputSchema,
-  useCase: getContentUsecase,
-  eventParser: contentEventParser,
-  options: contentAdapterOptions,
+export const getResearchAdapter = createLambdaAdapter({
+  schema: GetResearchInputSchema,
+  useCase: getResearchUsecase,
+  eventParser: getResearchEventParser,
+  options: deepResearchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
-});
+}); 

@@ -1,5 +1,5 @@
 export enum Queue {
-    content = 'content',
+    deepResearch = 'deepResearch',
 }
 
 export enum Topic {

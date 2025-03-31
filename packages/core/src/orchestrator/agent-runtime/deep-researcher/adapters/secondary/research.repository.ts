@@ -1,31 +1,31 @@
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { randomUUID } from 'crypto';
-import { RequestContentInput, RequestContentOutput } from '@metadata/agents/content-agent.schema';
+import { RequestDeepResearchInput, RequestDeepResearchOutput } from '@metadata/agents/deep-research-agent.schema';
 import { ValidUser } from '@metadata/saas-identity.schema';
 
-export interface ContentRepository {
-  saveContent(userId: string, content: RequestContentOutput, prompt: string): Promise<string>;
-  getContentById(contentId: string): Promise<RequestContentOutput | null>;
-  getContentByUserId(userId: string): Promise<RequestContentOutput[]>;
+export interface DeepResearchRepository {
+  saveDeepResearch(userId: string, research: RequestDeepResearchOutput, prompt: string): Promise<string>;
+  getDeepResearchById(researchId: string): Promise<RequestDeepResearchOutput | null>;
+  getDeepResearchByUserId(userId: string): Promise<RequestDeepResearchOutput[]>;
 }
 
-export const createContentRepository = (
+export const createDeepResearchRepository = (
   dynamoDbClient: DynamoDBDocumentClient
-): ContentRepository => {
-  const tableName = process.env.CONTENT_TABLE_NAME || 'ContentTable';
+): DeepResearchRepository => {
+  const tableName = process.env.DEEP_RESEARCH_TABLE_NAME || 'DeepResearchTable';
 
   return {
-    async saveContent(userId: string, content: RequestContentOutput, prompt: string): Promise<string> {
-      const contentId = randomUUID();
+    async saveDeepResearch(userId: string, research: RequestDeepResearchOutput, prompt: string): Promise<string> {
+      const researchId = randomUUID();
       const timestamp = new Date().toISOString();
 
       await dynamoDbClient.send(
         new PutCommand({
           TableName: tableName,
           Item: {
-            contentId,
+            researchId,
             userId,
-            content: content.content,
+            research: research.research,
             prompt,
             createdAt: timestamp,
             updatedAt: timestamp,
@@ -33,15 +33,15 @@ export const createContentRepository = (
         })
       );
 
-      return contentId;
+      return researchId;
     },
 
-    async getContentById(contentId: string): Promise<RequestContentOutput | null> {
+    async getDeepResearchById(researchId: string): Promise<RequestDeepResearchOutput | null> {
       const response = await dynamoDbClient.send(
         new GetCommand({
           TableName: tableName,
           Key: {
-            contentId,
+            researchId,
           },
         })
       );
@@ -51,11 +51,12 @@ export const createContentRepository = (
       }
 
       return {
-        content: response.Item.content,
+        userId: response.Item.userId,
+        research: response.Item.research,
       };
     },
 
-    async getContentByUserId(userId: string): Promise<RequestContentOutput[]> {
+    async getDeepResearchByUserId(userId: string): Promise<RequestDeepResearchOutput[]> {
       const response = await dynamoDbClient.send(
         new QueryCommand({
           TableName: tableName,
@@ -72,7 +73,8 @@ export const createContentRepository = (
       }
 
       return response.Items.map((item) => ({
-        content: item.content,
+        userId: item.userId,
+        research: item.research,
       }));
     },
   };

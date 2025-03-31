@@ -1,5 +1,5 @@
 import { 
-    contentTable
+    deepResearchTable
  } from "./database";
 import { 
   secrets,
@@ -11,7 +11,7 @@ export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
 const topics = [AgentTopic]
-const tables = [contentTable]
+const tables = [deepResearchTable]
 
 
 const apiResources = [
@@ -21,15 +21,15 @@ const apiResources = [
 ]
 
 
-api.route("GET /content", {
+api.route("GET /deep-research", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.contentGeneratorHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
 })
 
 
-api.route("POST /content", {
+api.route("POST /deep-research", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.requestContentHandler",
+  handler: "./packages/functions/src/agent-runtime.api.requestDeepResearchHandler",
 })
 
 

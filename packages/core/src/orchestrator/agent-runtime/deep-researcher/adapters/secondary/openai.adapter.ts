@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { ContentRequestInput ,userPromt, ContentRequestOutputSchema, ContentRequestOutput, systemPromptSchema } from "../../../../../../../metadata/agents/content-agent.schema";
+import { ContentRequestInput ,userPromt, ContentRequestOutputSchema, ContentRequestOutput, systemPromptSchema } from "../../../../../../../metadata/agents/deep-research-agent.schema";
 import { Resource } from "sst";
 import { withRetry } from "@utils/tools/retry";
 import { zodToOpenAIFormat } from "@utils/vendors/openai/schema-helpers";

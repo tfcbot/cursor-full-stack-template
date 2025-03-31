@@ -1,22 +1,22 @@
-import { contentTable } from "./database"
+import { deepResearchTable } from "./database"
 import { secrets } from "./secrets"
 
 
 
-export const contentQueue = new sst.aws.Queue("ContentQueue")   
+export const deepResearchQueue = new sst.aws.Queue("DeepResearchQueue")   
 
 
 
-contentQueue.subscribe({
-    handler: "./packages/functions/src/agent-runtime.api.contentHandler", 
+deepResearchQueue.subscribe({
+    handler: "./packages/functions/src/agent-runtime.api.deepResearchHandler", 
     link: [
-        contentTable, 
+        deepResearchTable, 
         ...secrets, 
     ], 
     permissions: [
         {
             actions: ["dynamodb:*"], 
-            resources: [contentTable.arn]
+            resources: [deepResearchTable.arn]
         }
     ],
 })

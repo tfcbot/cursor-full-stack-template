@@ -29,36 +29,36 @@ export class ApiService implements IApiService {
     };
   };
   
-  async getContent(): Promise<any> {
-    const absoluteUrl = this.getAbsoluteUrl('/content');
+  async getDeepResearch(): Promise<any> {
+    const absoluteUrl = this.getAbsoluteUrl('/deep-research');
     try {
       const response = await fetch(absoluteUrl, {
         method: 'GET',
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch content');
+        throw new Error('Failed to fetch deep research');
       }
       return response.json();
     } catch (error) {
-      console.error('Error fetching content:', error);
+      console.error('Error fetching deep research:', error);
       return [];
     }
   }
 
-  async postContent(content: string): Promise<any> {
-    const absoluteUrl = this.getAbsoluteUrl('/content');
+  async postDeepResearch(deepResearch: string): Promise<any> {
+    const absoluteUrl = this.getAbsoluteUrl('/deep-research');
     try {
       const response = await fetch(absoluteUrl, {
         method: 'POST',
         headers: this.getHeaders(),
-        body: content,
+        body: deepResearch,
       });
       if (!response.ok) {
-        throw new Error('Failed to post content');
+        throw new Error('Failed to post deep research');
       }
       return response.json();
     } catch (error) {
-      console.error('Error posting content:', error);
+      console.error('Error posting deep research:', error);
       throw error;
     }
   }

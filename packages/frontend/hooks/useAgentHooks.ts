@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/agent.service';
 
 
-export function retrieveContentHook() {
+export function retrieveDeepResearchHook() {
   const { data, isLoading: loading, error } = useQuery({
-    queryKey: ['content'],
+    queryKey: ['deepResearch'],
     queryFn: async () => {
-      const response = await apiService.getContent();
+      const response = await apiService.getDeepResearch();
       return response.agents;
     }
   });
