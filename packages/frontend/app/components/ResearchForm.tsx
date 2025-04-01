@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DeepResearchRequest, useGenerateDeepResearch } from '../api';
+import { ResearchRequest, useGenerateDeepResearch } from '../api';
 
-export function DeepResearchForm() {
+export function ResearchForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState<DeepResearchRequest>({
-    topic: '',
+  const [formData, setFormData] = useState<ResearchRequest>({
+    prompt: '',
     length: 'medium',
     tone: 'professional'
   });
@@ -24,14 +24,14 @@ export function DeepResearchForm() {
     
     mutate(formData, {
       onSuccess: (data) => {
-        router.push(`/deep-research/${data.id}`);
+        router.push(`/research/${data.id}`);
       }
     });
   };
   
   return (
     <div className="bg-bg-secondary p-8 rounded-lg shadow-card border border-border">
-      <h1 className="text-2xl font-bold mb-6 text-fg-primary">Generate Deep Research</h1>
+      <h1 className="text-2xl font-bold mb-6 text-fg-primary">Submit Research Task</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -41,11 +41,11 @@ export function DeepResearchForm() {
           <input
             type="text"
             id="topic"
-            name="topic"
-            value={formData.topic}
+            name="prompt"
+            value={formData.prompt}
             onChange={handleChange}
             required
-            placeholder="Enter a topic for in-depth research"
+            placeholder="Enter a topic to research"
             className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary placeholder-fg-tertiary"
           />
         </div>
@@ -99,7 +99,7 @@ export function DeepResearchForm() {
             isPending ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-90'
           }`}
         >
-          {isPending ? 'Researching...' : 'Generate Deep Research'}
+          {isPending ? 'Researching...' : 'Submit Research Task'}
         </button>
       </form>
     </div>

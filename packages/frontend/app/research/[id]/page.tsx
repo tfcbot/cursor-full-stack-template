@@ -1,20 +1,20 @@
-import { DeepResearchDetail } from '../../components/DeepResearchDetail';
+import { ResearchDetail } from '../../components/ResearchDetail';
 
-type DeepResearchDetailPageProps = {
+type ResearchDetailPageProps = {
   params: {
     id: string;
   };
 };
 
 // Make the page component async to properly handle params
-export default async function DeepResearchDetailPage({ params }: DeepResearchDetailPageProps) {
+export default async function ResearchDetailPage({ params }: ResearchDetailPageProps) {
   // Await the params object before destructuring
   const { id } = await params;
-  return <DeepResearchDetail deepResearchId={id} />;
+  return <ResearchDetail researchId={id} />;
 }
 
 // Since we're using a dynamic route, we need to generate metadata dynamically
-export async function generateMetadata({ params }: DeepResearchDetailPageProps) {
+export async function generateMetadata({ params }: ResearchDetailPageProps) {
   // Await the params object before destructuring
   const { id } = await params;
   return {

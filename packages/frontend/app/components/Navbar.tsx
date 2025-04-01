@@ -11,15 +11,15 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <Link href="/" className="text-xl font-semibold text-fg-primary">
-            Deep Research Generator
+            Research Agent
           </Link>
         </div>
         
         <div className="flex space-x-6">
           <NavLink href="/" active={pathname === '/'}>
-            Generate
+            Submit Task
           </NavLink>
-          <NavLink href="/deep-research" active={pathname === '/deep-research'}>
+          <NavLink href="/research" active={pathname === '/research'}>
             View Research
           </NavLink>
         </div>

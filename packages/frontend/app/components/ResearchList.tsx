@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useGetAllDeepResearch } from '../api';
 
-export function DeepResearchList() {
-  const { data: deepResearchList, isLoading, isError } = useGetAllDeepResearch();
+export function ResearchList() {
+  const { data: researchList, isLoading, isError } = useGetAllDeepResearch();
   
   if (isLoading) {
     return (
@@ -23,16 +23,16 @@ export function DeepResearchList() {
     );
   }
   
-  if (!deepResearchList || deepResearchList.length === 0) {
+  if (!researchList || researchList.length === 0) {
     return (
       <div className="bg-bg-secondary bg-opacity-60 p-8 rounded-lg text-center border border-border">
         <h2 className="text-xl font-medium text-fg-primary">No research yet</h2>
-        <p className="text-fg-secondary mt-2">Generate your first deep research to see it here.</p>
+        <p className="text-fg-secondary mt-2">Submit your first research task to see it here.</p>
         <Link 
           href="/" 
           className="mt-4 inline-block px-4 py-2 bg-accent-primary text-fg-primary rounded-md hover:bg-opacity-90"
         >
-          Generate Research
+          Submit Task
         </Link>
       </div>
     );
@@ -43,10 +43,10 @@ export function DeepResearchList() {
       <h1 className="text-2xl font-bold text-fg-primary">Your Research</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {deepResearchList.map((research) => (
+        {researchList.map((research) => (
           <Link 
             key={research.id}
-            href={`/deep-research/${research.id}`}
+            href={`/research/${research.id}`}
             className="block bg-bg-secondary p-6 rounded-lg shadow-card border border-border hover:border-accent-tertiary transition-all"
           >
             <h2 className="text-lg font-semibold text-fg-primary mb-2 truncate">{research.topic}</h2>
@@ -59,4 +59,4 @@ export function DeepResearchList() {
       </div>
     </div>
   );
-}
+} 

@@ -1,7 +1,7 @@
 import { DeepResearchList } from '../components/DeepResearchList';
 
 export const metadata = {
-  title: 'Your Research - Deep Research Generator',
+  title: 'Your Research - Research Agent',
   description: 'View all your generated research',
 };
 

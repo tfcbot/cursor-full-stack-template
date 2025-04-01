@@ -3,8 +3,8 @@
 import { useGetDeepResearch } from '../api';
 import Link from 'next/link';
 
-export function DeepResearchDetail({ deepResearchId }: { deepResearchId: string }) {
-  const { data: research, isLoading, isError } = useGetDeepResearch(deepResearchId);
+export function ResearchDetail({ researchId }: { researchId: string }) {
+  const { data: research, isLoading, isError } = useGetDeepResearch(researchId);
   
   if (isLoading) {
     return (
@@ -20,7 +20,7 @@ export function DeepResearchDetail({ deepResearchId }: { deepResearchId: string 
         <h2 className="text-error font-medium">Error loading research</h2>
         <p className="text-fg-secondary mt-2">Could not load the requested research.</p>
         <Link 
-          href="/deep-research" 
+          href="/research" 
           className="mt-4 inline-block px-4 py-2 bg-accent-primary text-fg-primary rounded-md hover:bg-opacity-90"
         >
           Back to All Research
@@ -34,7 +34,7 @@ export function DeepResearchDetail({ deepResearchId }: { deepResearchId: string 
       <div className="flex justify-between items-start">
         <h1 className="text-2xl md:text-3xl font-bold text-fg-primary">{research.topic}</h1>
         <Link 
-          href="/deep-research" 
+          href="/research" 
           className="text-accent-secondary hover:text-accent-tertiary text-sm"
         >
           Back to All Research
@@ -68,7 +68,7 @@ export function DeepResearchDetail({ deepResearchId }: { deepResearchId: string 
           href={`/`}
           className="px-4 py-2 bg-accent-primary text-fg-primary rounded-md hover:bg-opacity-90"
         >
-          Generate New Research
+          Submit New Task
         </Link>
       </div>
     </div>
