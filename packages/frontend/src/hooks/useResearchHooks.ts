@@ -1,15 +1,15 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ResearchRequest } from '@metadata/api.schema';
-import { getAllResearch, getResearchById, postResearch } from '../services/api.service';
+import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
+import { getAllResearch, getResearchById, postResearch } from '../services/api';
 
 /**
  * Hook for generating research
  */
 export function useRequestResearch() {
   return useMutation({
-    mutationFn: async (request: ResearchRequest) => {
+    mutationFn: async (request: RequestResearchInput) => {
       return await postResearch(request);
     },
   });

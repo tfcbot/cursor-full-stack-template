@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useRequestResearch } from '../../hooks/useResearchHooks';
+import { useRequestResearch } from '../hooks/useResearchHooks';
 import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
 import { v4 as uuidv4 } from 'uuid';
 

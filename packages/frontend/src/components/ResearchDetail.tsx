@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetResearchById } from '@/hooks/useResearchHooks';
+import { useGetResearchById } from '@/src/hooks/useResearchHooks';
 
 import Link from 'next/link';
 
@@ -33,7 +33,7 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
-        <h1 className="text-2xl md:text-3xl font-bold text-fg-primary">{research.topic}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-fg-primary">{research.title}</h1>
         <Link 
           href="/research" 
           className="text-accent-secondary hover:text-accent-tertiary text-sm"

@@ -1,4 +1,4 @@
-import { ResearchList } from '../components/ResearchList';
+import { ResearchList } from '../../components/ResearchList';
 
 export const metadata = {
   title: 'Your Research - Research Agent',

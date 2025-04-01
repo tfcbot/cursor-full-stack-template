@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useGetAllResearch } from '../api';
+import { useGetAllResearch } from '../hooks/useResearchHooks';
 
 export function ResearchList() {
   const { data: researchList, isLoading, isError } = useGetAllResearch();
@@ -45,11 +45,11 @@ export function ResearchList() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {researchList.map((research) => (
           <Link 
-            key={research.id}
-            href={`/research/${research.id}`}
+            key={research.researchId}
+            href={`/research/${research.researchId}`}
             className="block bg-bg-secondary p-6 rounded-lg shadow-card border border-border hover:border-accent-tertiary transition-all"
           >
-            <h2 className="text-lg font-semibold text-fg-primary mb-2 truncate">{research.topic}</h2>
+            <h2 className="text-lg font-semibold text-fg-primary mb-2 truncate">{research.title}</h2>
             <p className="text-fg-tertiary text-sm mb-4">
               {new Date(research.createdAt).toLocaleDateString()}
             </p>

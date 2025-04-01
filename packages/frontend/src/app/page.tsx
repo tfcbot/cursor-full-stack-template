@@ -1,4 +1,4 @@
-import { ResearchForm } from './components/ResearchForm';
+import { ResearchForm } from '../components/ResearchForm';
 
 export default function Home() {
   return (

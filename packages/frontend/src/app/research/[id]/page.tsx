@@ -1,4 +1,4 @@
-import { ResearchDetail } from '../../components/ResearchDetail';
+import { ResearchDetail } from '../../../components/ResearchDetail';
 
 type ResearchDetailPageProps = {
   params: {

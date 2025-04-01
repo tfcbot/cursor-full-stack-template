@@ -19,8 +19,10 @@ ${input.prompt}
 `
 
 export const RequestResearchOutputSchema = z.object({
+    researchId: z.string(),
     title: z.string(), 
     content: z.string(),
+    createdAt: z.string(),
 });
 
 export const GetResearchInputSchema = z.object({    

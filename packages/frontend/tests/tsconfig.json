@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+      "target": "es6",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "baseUrl": "..",
+      "paths": {
+        "@/*": ["src/*"],
+        "@services/*": ["../../packages/frontend/src/services/*"],
+        "@metadata/*": ["../../packages/metadata/*"]
+      },
+      "jsx": "preserve",
+      "esModuleInterop": true,
+      "strict": true,
+      "skipLibCheck": true,
+      "types": ["jest", "node"]
+    },
+    "include": [
+      "**/*.test.ts",
+      "**/*.ts",
+      "**/*.tsx",
+      "../src/**/*.ts",
+      "../src/**/*.tsx"
+    ]
+}
+  
