@@ -3,21 +3,22 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-      "baseUrl": ".",
-      "paths": {
-        "@services/*": ["src/services/*"],
-        "@agent-runtime/*": ["src/orchestrator/agent-runtime/*"],
-        "@metadata/*": ["../../packages/metadata/*"],
-        "@lib/*": ["src/lib/*"],
-        "@utils/*": ["../../packages/utils/src/*"],
-      }, 
-     //"esModuleInterop": true
+    "baseUrl": ".",
+    "paths": {
+      "@orchestrator/*": ["../../packages/core/src/orchestrator/*"], 
+      "@agent-runtime/*": ["../../packages/core/src/orchestrator/agent-runtime/*"],
+      "@metadata/*": ["../../packages/metadata/*"],
+      "@lib/*": ["../../packages/core/src/lib/*"],
+      "@utils/*": ["../../packages/core/src/utils/*"]
     }, 
-    "include": [
-      "**/*.test.ts", 
-      "**/*.ts",    
-      "src/**/*", 
-      "test/**/*", 
-      "sst-env.d.ts"
-, "../metadata/agents", "../metadata/credits.schema.ts", "../metadata/http-responses.schema.ts", "../metadata/orchestrator.schema.ts", "../metadata/task.schema.ts", "../metadata/user.schema.ts"    ]
+    "typeRoots": ["./node_modules/@types", "./types"]
+  }, 
+  "include": [
+    "**/*.test.ts", 
+    "**/*.ts",    
+    "src/**/*", 
+    "test/**/*", 
+    "types/**/*",
+    "sst-env.d.ts"
+  ]
 }

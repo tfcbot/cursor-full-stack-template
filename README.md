@@ -22,15 +22,35 @@ A template to create a monorepo SST v3 project. [Learn more](https://sst.dev/doc
 4. Deploy!
 
    ```bash
-   npm install
-   npx sst deploy
+   bun install
+   bun sst deploy
    ```
 
 5. Optionally, enable [_git push to deploy_](https://sst.dev/docs/console/#autodeploy).
 
+## Using Bun
+
+This project uses [Bun](https://bun.sh/) as the JavaScript runtime and package manager. Bun offers significantly faster installation times and better performance compared to npm or Yarn.
+
+### Key Bun commands
+
+```bash
+# Install dependencies
+bun install
+
+# Run development server
+bun run dev
+
+# Build the project
+bun run build
+
+# Run tests
+bun test
+```
+
 ## Usage
 
-This template uses [npm Workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces). It has 3 packages to start with and you can add more it.
+This template uses [Workspaces](https://bun.sh/docs/install/workspaces). It has 3 packages to start with and you can add more it.
 
 1. `core/`
 
