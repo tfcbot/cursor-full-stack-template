@@ -1,16 +1,15 @@
 import { defineConfig } from 'vitest/config';
-import path from 'path';
+import * as path from 'path';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
-    include: process.env.TEST_TYPE === 'integration' 
-      ? ['tests/integration/**/*.test.ts', 'tests/integration/**/*.test.tsx'] 
-      : process.env.TEST_TYPE === 'unit'
-        ? ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx']
-        : ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+    include: [
+      '**/*.test.ts',
+      '**/*.test.tsx'
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
@@ -29,8 +28,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@services': path.resolve(__dirname, './src/services'),
+      '@services': path.resolve(__dirname, '../frontend/src/services'),
       '@metadata': path.resolve(__dirname, '../metadata')
     }
   }

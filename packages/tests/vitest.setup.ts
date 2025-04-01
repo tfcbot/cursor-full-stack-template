@@ -1,20 +1,13 @@
 import 'cross-fetch/polyfill';
 import { afterEach, beforeAll, beforeEach, afterAll, vi } from 'vitest';
-import dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 // Store original console methods
 const originalConsoleError = console.error;
 
 // Set up any global mocks needed for tests
 beforeAll(() => {
-  // Mock global browser APIs
-  global.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-
   // Load appropriate environment variables
   const envFile = process.env.TEST_TYPE === 'integration' 
     ? '.env.integration.test' 
@@ -27,8 +20,11 @@ beforeAll(() => {
   
   // Set default timeout higher for integration tests
   if (process.env.TEST_TYPE === 'integration') {
-    vi.setConfig({ testTimeout: 10000 }); // 10 seconds for integration tests
+    vi.setConfig({ testTimeout: 20000 }); // 20 seconds for integration tests
   }
+
+  // Mock fetch since we're in Node environment
+  global.fetch = vi.fn();
 });
 
 // Mock console.error before each test

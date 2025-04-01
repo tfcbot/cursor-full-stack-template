@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
-import { getAllResearch, getResearchById, postResearch } from '@services/api';
-import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
+import { getAllResearch, getResearchById, postResearch } from '../frontend/src/services/api';
+import { RequestResearchInput } from '../metadata/agents/research-agent.schema';
 
 // Mock the sst module for integration tests
 vi.mock('sst', () => ({
@@ -39,8 +39,48 @@ describe('API Integration Tests', () => {
     prompt: 'Research prompt goes here'
   };
 
+  // Mock fetch implementation for integration tests
   beforeEach(() => {
-    global.fetch = vi.fn();
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation((url, options) => {
+      // Simulate different responses based on URL and method
+      if (url.includes(`/research/${mockResearchId}`)) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResearchData)
+        });
+      } else if (url.includes('/research/non-existent-id')) {
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found'
+        });
+      } else if (url.includes('/research') && options?.method === 'GET') {
+        return Promise.resolve({
+          json: () => Promise.resolve(mockResearchList)
+        });
+      } else if (url.includes('/research') && options?.method === 'POST') {
+        const body = JSON.parse(options.body as string);
+        if (!body.prompt) {
+          return Promise.resolve({
+            ok: false,
+            status: 400,
+            statusText: 'Bad Request',
+            text: () => Promise.resolve('Invalid input')
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResearchData)
+        });
+      }
+      
+      // Default fallback
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      });
+    });
   });
 
   afterEach(() => {
@@ -48,12 +88,7 @@ describe('API Integration Tests', () => {
   });
 
   describe('getResearchById', () => {
-    it('should fetch research by ID successfully', async () => {
-      (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResearchData)
-      });
-
+    it('should call fetch with correct URL and method', async () => {
       const result = await getResearchById(mockResearchId);
       
       expect(global.fetch).toHaveBeenCalledWith(
@@ -65,25 +100,14 @@ describe('API Integration Tests', () => {
       expect(result).toEqual(mockResearchData);
     });
 
-    it('should return null when API call fails', async () => {
-      (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      });
-
-      const result = await getResearchById(mockResearchId);
-      
+    it('should handle API call failures appropriately', async () => {
+      const result = await getResearchById('non-existent-id');
       expect(result).toBeNull();
     });
   });
 
   describe('getAllResearch', () => {
-    it('should fetch all research successfully', async () => {
-      (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        json: () => Promise.resolve(mockResearchList)
-      });
-
+    it('should retrieve research data', async () => {
       const result = await getAllResearch();
       
       expect(global.fetch).toHaveBeenCalledWith(
@@ -97,12 +121,7 @@ describe('API Integration Tests', () => {
   });
 
   describe('postResearch', () => {
-    it('should post research request successfully', async () => {
-      (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResearchData)
-      });
-
+    it('should create new research and return data', async () => {
       const result = await postResearch(mockRequestInput);
       
       expect(global.fetch).toHaveBeenCalledWith(
@@ -118,15 +137,12 @@ describe('API Integration Tests', () => {
       expect(result).toEqual(mockResearchData);
     });
 
-    it('should throw error when API call fails', async () => {
-      (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        statusText: 'Bad Request',
-        text: () => Promise.resolve('Invalid input')
-      });
-
-      await expect(postResearch(mockRequestInput)).rejects.toThrow();
+    it('should handle API call failures appropriately', async () => {
+      const invalidInput: RequestResearchInput = {
+        prompt: ''
+      };
+      
+      await expect(postResearch(invalidInput)).rejects.toThrow();
     });
   });
 });

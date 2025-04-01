@@ -5,22 +5,22 @@
       "moduleResolution": "node",
       "baseUrl": "..",
       "paths": {
-        "@/*": ["src/*"],
-        "@services/*": ["../../packages/frontend/src/services/*"],
-        "@metadata/*": ["../../packages/metadata/*"]
+        "@services/*": ["frontend/src/services/*"],
+        "@metadata/*": ["metadata/*"]
       },
       "jsx": "preserve",
       "esModuleInterop": true,
       "strict": true,
       "skipLibCheck": true,
-      "types": ["jest", "node"]
+      "types": ["vitest/globals", "node"]
     },
     "include": [
       "**/*.test.ts",
       "**/*.ts",
       "**/*.tsx",
-      "../src/**/*.ts",
-      "../src/**/*.tsx"
+      "../frontend/src/**/*.ts",
+      "../frontend/src/**/*.tsx",
+      "../metadata/**/*.ts"
     ]
 }
   

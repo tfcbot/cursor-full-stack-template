@@ -1,7 +1,6 @@
-/** @jest-environment jsdom */
 import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest';
-import { getAllResearch, getResearchById, postResearch } from '@services/api';
-import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
+import { getAllResearch, getResearchById, postResearch } from '../frontend/src/services/api';
+import { RequestResearchInput } from '../metadata/agents/research-agent.schema';
 
 // Mock the sst module
 vi.mock('sst', () => ({
@@ -39,10 +38,6 @@ describe('API Service Tests', () => {
   const mockRequestInput: RequestResearchInput = {
     prompt: 'Research prompt goes here'
   };
-
-  beforeEach(() => {
-    global.fetch = vi.fn();
-  });
 
   afterEach(() => {
     vi.clearAllMocks();
