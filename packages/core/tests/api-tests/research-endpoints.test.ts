@@ -3,10 +3,6 @@ import { describe, expect, test, beforeAll } from 'bun:test';
 
 // Environment variables
 const API_URL = 'https://tylexj17u5.execute-api.us-east-1.amazonaws.com';
-const SKIP_API_TESTS = process.env.SKIP_API_TESTS === 'true' || true; // Skip by default
-
-// Helper function to conditionally skip tests
-const conditionalTest = SKIP_API_TESTS ? test.skip : test;
 
 describe('Research API Endpoints', () => {
     const headers = {
@@ -27,7 +23,7 @@ describe('Research API Endpoints', () => {
   };
 
   describe('POST /research endpoint', () => {
-    conditionalTest('should successfully submit a research request', async () => {
+    test('should successfully submit a research request', async () => {
       console.log(API_URL);
       const response = await fetch(`${API_URL}/research`, {
         method: 'POST',
@@ -44,7 +40,7 @@ describe('Research API Endpoints', () => {
       expect(responseData.data.researchId).toBeDefined();
     });
 
-    conditionalTest('should handle validation errors for invalid requests', async () => {
+    test('should handle validation errors for invalid requests', async () => {
       // Call the endpoint with invalid data (empty prompt)
       const response = await fetch(`${API_URL}/research`, {
         method: 'POST',
@@ -63,7 +59,7 @@ describe('Research API Endpoints', () => {
   });
 
   describe('GET /research endpoint', () => {
-    conditionalTest('should retrieve all research for the user', async () => {
+    test('should retrieve all research for the user', async () => {
       // Call the endpoint
       const response = await fetch(`${API_URL}/research`, {
         method: 'GET',
@@ -87,7 +83,7 @@ describe('Research API Endpoints', () => {
       }
     });
 
-    conditionalTest('should retrieve a specific research by ID', async () => {
+    test('should retrieve a specific research by ID', async () => {
       const researchId = 'test-research-123';
       
       // Call the endpoint with specific ID
@@ -109,7 +105,7 @@ describe('Research API Endpoints', () => {
       }
     });
 
-    conditionalTest('should handle not found errors for non-existent research', async () => {
+    test('should handle not found errors for non-existent research', async () => {
       const nonExistentId = 'non-existent-id';
       
       // Call the endpoint with non-existent ID
@@ -128,7 +124,7 @@ describe('Research API Endpoints', () => {
   });
 
   describe('Authentication and Authorization', () => {
-    conditionalTest('should return 401 for unauthorized requests', async () => {
+    test('should return 401 for unauthorized requests', async () => {
       // Call with missing auth header
       const response = await fetch(`${API_URL}/research`, {
         method: 'GET',

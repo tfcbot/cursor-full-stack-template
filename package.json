@@ -9,7 +9,8 @@
     "build": "bun run --cwd packages/frontend build",
     "test": "bun test",
     "test:core": "bun run --cwd packages/core test",
-    "test:frontend": "bun run --cwd packages/frontend test"
+    "test:frontend": "bun run --cwd packages/frontend test",
+    "test:api": "bun run --cwd packages/core test:api"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22",

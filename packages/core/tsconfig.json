@@ -9,7 +9,7 @@
       "@agent-runtime/*": ["../../packages/core/src/orchestrator/agent-runtime/*"],
       "@metadata/*": ["../../packages/metadata/*"],
       "@lib/*": ["../../packages/core/src/lib/*"],
-      "@utils/*": ["../../packages/core/src/utils/*"]
+      "@utils/*": ["../../packages/utils/src/*"]
     }, 
     "typeRoots": ["./node_modules/@types", "./types"]
   }, 
