@@ -1,7 +1,7 @@
 /**
- * Deep Research Generation Request Adapter
+ * Research Generation Request Adapter
  * 
- * This module provides a Lambda adapter for handling deep research generation requests.
+ * This module provides a Lambda adapter for handling research generation requests.
  * It uses the lambda adapter factory to create a standardized Lambda handler
  * with authentication, validation, and error handling.
  */
@@ -12,7 +12,7 @@ import {
     LambdaAdapterOptions,
     GetUserInfo
   } from '@lib/lambda-adapter.factory';
-import { RequestDeepResearchInputSchema, RequestDeepResearchInput } from "@metadata/agents/deep-research-agent.schema";
+import { RequestResearchInputSchema, RequestResearchInput } from "@metadata/agents/research-agent.schema";
 import { OrchestratorHttpResponses } from '@metadata/http-responses.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
@@ -23,10 +23,10 @@ import { topicPublisher } from '@lib/topic-publisher.adapter';
 
 /**
  * Parser function that transforms the API Gateway event into the format
- * expected by the deep research generation use case.
+ * expected by the research generation use case.
  * The validUser parameter contains the user information returned by getUserInfo.
  */
-const deepResearchEventParser: EventParser<RequestDeepResearchInput> = (
+const researchEventParser: EventParser<RequestResearchInput> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
@@ -37,7 +37,7 @@ const deepResearchEventParser: EventParser<RequestDeepResearchInput> = (
   const parsedBody = JSON.parse(event.body);
   
 
-  const parsedBodyWithIds = RequestDeepResearchInputSchema.parse({
+  const parsedBodyWithIds = RequestResearchInputSchema.parse({
     ...parsedBody,
     ...validUser,
     orderId: randomUUID(),
@@ -50,9 +50,9 @@ const deepResearchEventParser: EventParser<RequestDeepResearchInput> = (
 };
 
 /**
- * Configuration options for the deep research generation adapter
+ * Configuration options for the research generation adapter
  */
-const deepResearchAdapterOptions: LambdaAdapterOptions = {
+const researchAdapterOptions: LambdaAdapterOptions = {
   requireAuth: false,
   requireBody: true,
   requiredFields: ['prompt', 'contentType']
@@ -60,16 +60,16 @@ const deepResearchAdapterOptions: LambdaAdapterOptions = {
 
 
 /**
- * Use case for publishing a deep research generation request.
- * The input parameter will contain the complete request object returned by deepResearchEventParser,
+ * Use case for publishing a research generation request.
+ * The input parameter will contain the complete request object returned by researchEventParser,
  * which includes the user information from getUserInfo.
  */
-const publishMessageUsecase = async (input: RequestDeepResearchInput) => {
+const publishMessageUsecase = async (input: RequestResearchInput) => {
   topicPublisher.publishAgentMessage({
     topic: Topic.agent,
     id: randomUUID(),
     timestamp: new Date().toISOString(),
-    queue: Queue.deepResearch,
+    queue: Queue.research,
     payload: {
       id: randomUUID(),
       message: input 
@@ -78,18 +78,18 @@ const publishMessageUsecase = async (input: RequestDeepResearchInput) => {
 }
 
 /**
- * Lambda adapter for handling deep research generation requests
+ * Lambda adapter for handling research generation requests
  * 
  * This adapter:
  * 1. Validates the request body
- * 2. Parses and validates the input using deepResearchEventParser
- * 3. Executes the deep research generation use case with the combined user and request data
+ * 2. Parses and validates the input using researchEventParser
+ * 3. Executes the research generation use case with the combined user and request data
  * 4. Formats and returns the response
  */
-export const requestDeepResearchAdapter = createLambdaAdapter({
-  schema: RequestDeepResearchInputSchema,
+export const requestResearchAdapter = createLambdaAdapter({
+  schema: RequestResearchInputSchema,
   useCase: publishMessageUsecase,
-  eventParser: deepResearchEventParser,
-  options: deepResearchAdapterOptions,
-  responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: { message: 'Deep research generation request published' } })
+  eventParser: researchEventParser,
+  options: researchAdapterOptions,
+  responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: { message: 'Research generation request published' } })
 }); 

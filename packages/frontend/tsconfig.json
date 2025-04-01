@@ -23,6 +23,6 @@
       "@metadata/*": ["../../packages/metadata/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../metadata/api.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../metadata/api.schema.ts"],
   "exclude": ["node_modules"]
 }

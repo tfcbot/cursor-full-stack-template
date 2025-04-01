@@ -1,6 +1,6 @@
 import { Queue, Topic } from "./orchestrator.schema";
 import { z } from "zod";
-import { RequestDeepResearchInputSchema } from "./agents/deep-research-agent.schema";
+import { RequestResearchInputSchema } from "./agents/research-agent.schema";
 
 export const AgentMessageSchema = z.object({
   topic: z.nativeEnum(Topic),
@@ -12,15 +12,24 @@ export const AgentMessageSchema = z.object({
 
 export type AgentMessage = z.infer<typeof AgentMessageSchema>;
 
-export const DeepResearchRequestTaskSchema = AgentMessageSchema.extend({
-  payload: RequestDeepResearchInputSchema,
+/**
+ * Deliverable Schemas
+ */
+export const DeliverableSchema = z.object({
+    deliverableId: z.string(),
 });
 
-export type DeepResearchRequestTask = z.infer<typeof DeepResearchRequestTaskSchema>;
+/**
+ * Task Schemas
+ */
+export const ResearchRequestTaskSchema = AgentMessageSchema.extend({
+  payload: RequestResearchInputSchema,
+});
 
-export type Task =
-  | AgentMessage
-  | DeepResearchRequestTask;
+export type ResearchRequestTask = z.infer<typeof ResearchRequestTaskSchema>;
+
+export type AgentTask =
+  | ResearchRequestTask;
 
 
 

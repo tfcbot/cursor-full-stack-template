@@ -1,21 +1,21 @@
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { randomUUID } from 'crypto';
-import { RequestDeepResearchInput, RequestDeepResearchOutput } from '@metadata/agents/deep-research-agent.schema';
+import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
 import { ValidUser } from '@metadata/saas-identity.schema';
 
-export interface DeepResearchRepository {
-  saveDeepResearch(userId: string, research: RequestDeepResearchOutput, prompt: string): Promise<string>;
-  getDeepResearchById(researchId: string): Promise<RequestDeepResearchOutput | null>;
-  getDeepResearchByUserId(userId: string): Promise<RequestDeepResearchOutput[]>;
+export interface ResearchRepository {
+  saveResearch(userId: string, research: RequestResearchOutput, prompt: string): Promise<string>;
+  getResearchById(researchId: string): Promise<RequestResearchOutput | null>;
+  getResearchByUserId(userId: string): Promise<RequestResearchOutput[]>;
 }
 
-export const createDeepResearchRepository = (
+export const createResearchRepository = (
   dynamoDbClient: DynamoDBDocumentClient
-): DeepResearchRepository => {
-  const tableName = process.env.DEEP_RESEARCH_TABLE_NAME || 'DeepResearchTable';
+): ResearchRepository => {
+  const tableName = process.env.RESEARCH_TABLE_NAME || 'ResearchTable';
 
   return {
-    async saveDeepResearch(userId: string, research: RequestDeepResearchOutput, prompt: string): Promise<string> {
+    async saveResearch(userId: string, research: RequestResearchOutput, prompt: string): Promise<string> {
       const researchId = randomUUID();
       const timestamp = new Date().toISOString();
 
@@ -36,7 +36,7 @@ export const createDeepResearchRepository = (
       return researchId;
     },
 
-    async getDeepResearchById(researchId: string): Promise<RequestDeepResearchOutput | null> {
+    async getResearchById(researchId: string): Promise<RequestResearchOutput | null> {
       const response = await dynamoDbClient.send(
         new GetCommand({
           TableName: tableName,
@@ -56,7 +56,7 @@ export const createDeepResearchRepository = (
       };
     },
 
-    async getDeepResearchByUserId(userId: string): Promise<RequestDeepResearchOutput[]> {
+    async getResearchByUserId(userId: string): Promise<RequestResearchOutput[]> {
       const response = await dynamoDbClient.send(
         new QueryCommand({
           TableName: tableName,

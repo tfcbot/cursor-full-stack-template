@@ -1,7 +1,7 @@
 /**
- * Deep Research Request Adapter
+ * Research Request Adapter
  * 
- * This module provides a Lambda adapter for handling deep research requests.
+ * This module provides a Lambda adapter for handling research requests.
  * It uses the lambda adapter factory to create a standardized Lambda handler
  * with authentication, validation, and error handling.
  */
@@ -13,17 +13,17 @@ import {
   LambdaAdapterOptions 
 } from '@lib/lambda-adapter.factory';
 import { randomUUID } from 'crypto';
-import { GetResearchInput, GetResearchInputSchema } from '@metadata/agents/deep-research-agent.schema';
+import { GetResearchInput, GetResearchInputSchema } from '@metadata/agents/research-agent.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
-import { getResearchUsecase } from '@agent-runtime/deep-researcher/usecase/get-research.usecase';
+import { getResearchUsecase } from '@agent-runtime/researcher/usecase/get-research.usecase';
 
 
 
 
 /**
  * Parser function that transforms the API Gateway event into the format
- * expected by the deep research use case
+ * expected by the research use case
  */
 const getResearchEventParser: EventParser<GetResearchInput> = (
   event: APIGatewayProxyEventV2,
@@ -48,9 +48,9 @@ const getResearchEventParser: EventParser<GetResearchInput> = (
 };
 
 /**
- * Configuration options for the deep research adapter
+ * Configuration options for the research adapter
  */
-const deepResearchAdapterOptions: LambdaAdapterOptions = {
+const researchAdapterOptions: LambdaAdapterOptions = {
   requireAuth: false,
   requireBody: true,
   requiredFields: ['researchId']
@@ -58,18 +58,18 @@ const deepResearchAdapterOptions: LambdaAdapterOptions = {
 
 
 /**
- * Lambda adapter for handling deep research requests
+ * Lambda adapter for handling research requests
  * 
  * This adapter:
  * 1. Validates the request body
  * 2. Parses and validates the input using the schema
- * 3. Executes the deep research use case
+ * 3. Executes the research use case
  * 4. Formats and returns the response
  */
 export const getResearchAdapter = createLambdaAdapter({
   schema: GetResearchInputSchema,
   useCase: getResearchUsecase,
   eventParser: getResearchEventParser,
-  options: deepResearchAdapterOptions,
+  options: researchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
 }); 

@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { ContentRequestInput ,userPromt, ContentRequestOutputSchema, ContentRequestOutput, systemPromptSchema } from "../../../../../../../metadata/agents/deep-research-agent.schema";
+import { RequestResearchInput, RequestResearchOutput, RequestResearchOutputSchema, systemPrompt, userPromt } from "@metadata/agents/research-agent.schema";
 import { Resource } from "sst";
 import { withRetry } from "@utils/tools/retry";
 import { zodToOpenAIFormat } from "@utils/vendors/openai/schema-helpers";
@@ -8,7 +8,7 @@ const client = new OpenAI({
   apiKey: Resource.OpenAiApiKey.value
 });
 
-export const createContent = async (input: ContentRequestInput): Promise<ContentRequestOutput> => {
+export const createContent = async (input: RequestResearchInput): Promise<RequestResearchOutput> => {
   try {
     // Construct the prompt
    
@@ -17,17 +17,17 @@ export const createContent = async (input: ContentRequestInput): Promise<Content
       tools: [{
         type: "web_search_preview"
       }],
-      instructions: systemPromptSchema,
+      instructions: systemPrompt,
       input: [
         {"role": "user", "content": userPromt(input)}
       ],
-      text: zodToOpenAIFormat(ContentRequestOutputSchema, "content")
+      text: zodToOpenAIFormat(RequestResearchOutputSchema, "content")
     });
     
     // Parse the response and validate against the schema
     const parsedResponse = JSON.parse(response.output_text);
     
-    const content = ContentRequestOutputSchema.parse(parsedResponse);
+    const content = RequestResearchOutputSchema.parse(parsedResponse);
     
     return content;
   } catch (error) {

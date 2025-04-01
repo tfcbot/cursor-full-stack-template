@@ -2,19 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ResearchRequest, useGenerateDeepResearch } from '../api';
+import { useRequestResearch } from '../../hooks/useResearchHooks';
+import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
+import { v4 as uuidv4 } from 'uuid';
 
 export function ResearchForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState<ResearchRequest>({
+  const [formData, setFormData] = useState<RequestResearchInput>({
     prompt: '',
-    length: 'medium',
-    tone: 'professional'
   });
   
-  const { mutate, isPending, isError, error } = useGenerateDeepResearch();
+  const { mutate, isPending, isError, error } = useRequestResearch();
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -24,7 +24,7 @@ export function ResearchForm() {
     
     mutate(formData, {
       onSuccess: (data) => {
-        router.push(`/research/${data.id}`);
+        router.push(`/research/`);
       }
     });
   };
@@ -48,42 +48,6 @@ export function ResearchForm() {
             placeholder="Enter a topic to research"
             className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary placeholder-fg-tertiary"
           />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="length" className="block text-sm font-medium text-fg-secondary mb-1">
-              Research Length
-            </label>
-            <select
-              id="length"
-              name="length"
-              value={formData.length}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary"
-            >
-              <option value="short">Short</option>
-              <option value="medium">Medium</option>
-              <option value="long">Long</option>
-            </select>
-          </div>
-          
-          <div>
-            <label htmlFor="tone" className="block text-sm font-medium text-fg-secondary mb-1">
-              Research Tone
-            </label>
-            <select
-              id="tone"
-              name="tone"
-              value={formData.tone}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary"
-            >
-              <option value="casual">Casual</option>
-              <option value="professional">Professional</option>
-              <option value="humorous">Humorous</option>
-            </select>
-          </div>
         </div>
         
         {isError && (

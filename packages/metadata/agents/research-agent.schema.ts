@@ -1,8 +1,6 @@
 import { z } from "zod";
 
 export const RequestResearchInputSchema = z.object({
-    userId: z.string(),
-    researchId: z.string(),
     prompt: z.string(),
 });
 
@@ -21,12 +19,11 @@ ${input.prompt}
 `
 
 export const RequestResearchOutputSchema = z.object({
-    userId: z.string(),
-    research: z.string(),
+    title: z.string(), 
+    content: z.string(),
 });
 
 export const GetResearchInputSchema = z.object({    
-    userId: z.string(),
     researchId: z.string(),
 });
 

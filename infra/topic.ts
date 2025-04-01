@@ -1,15 +1,15 @@
-import { deepResearchQueue } from "./queues"
+import { researchQueue } from "./queues"
 
 
 // Topics
 export const AgentTopic = new sst.aws.SnsTopic("AgentTopic")
 
 AgentTopic.subscribeQueue(
-  "deepResearch", 
-  deepResearchQueue.arn, 
+  "research", 
+  researchQueue.arn, 
   {
       filter: {
-          "queue": ["deepResearch"]
+          "queue": ["research"]
       }
   }
 )

@@ -1,16 +1,16 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { DeepResearch, DeepResearchRequest } from '../app/api';
-import { addResearch, getAllResearch, getResearchById } from '../services/researchService';
+import { ResearchRequest } from '@metadata/api.schema';
+import { getAllResearch, getResearchById, postResearch } from '../services/api.service';
 
 /**
  * Hook for generating research
  */
-export function useGenerateResearch() {
+export function useRequestResearch() {
   return useMutation({
-    mutationFn: async (request: DeepResearchRequest) => {
-      return await addResearch(request);
+    mutationFn: async (request: ResearchRequest) => {
+      return await postResearch(request);
     },
   });
 }
@@ -18,7 +18,7 @@ export function useGenerateResearch() {
 /**
  * Hook for fetching all research
  */
-export function useAllResearch() {
+export function useGetAllResearch() {
   return useQuery({
     queryKey: ['allResearch'],
     queryFn: async () => {
@@ -30,14 +30,14 @@ export function useAllResearch() {
 /**
  * Hook for fetching a specific research by ID
  */
-export function useResearchById(researchId?: string) {
+export function useGetResearchById(researchId?: string) {
   return useQuery({
     queryKey: ['research', researchId],
     queryFn: async () => {
       if (!researchId) {
         return null;
       }
-      
+
       return await getResearchById(researchId);
     },
     enabled: !!researchId,

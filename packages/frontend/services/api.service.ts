@@ -1,10 +1,9 @@
 'use server';
 
+import { RequestResearchInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
 import { Resource } from "sst";
 
-// Instead of importing from SST, we'll use environment variables
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-const API_URL = Resource.BackendApi.url; // For simplicity, hardcode to /api for now
+const API_URL = Resource.BackendApi.url;
 
 const API_CONFIG = {
   baseUrl: API_URL,
@@ -13,19 +12,6 @@ const API_CONFIG = {
     'Content-Type': 'application/json'
   }
 };
-
-
-export interface DeepResearchRequest {
-  prompt: string;
-  researchId?: string;
-}
-
-export interface DeepResearchResponse {
-  researchId: string;
-  status: string;
-  [key: string]: any;
-}
-
 
 
 export const getAbsoluteUrl = async (path: string): Promise<string> => {
@@ -38,8 +24,16 @@ export const getHeaders = async (): Promise<HeadersInit> => {
   };
 };
 
-export const getDeepResearch = async (): Promise<DeepResearchResponse[]> => {
-  const absoluteUrl = await getAbsoluteUrl('/deep-research');
+export const getAllResearch = async (): Promise<RequestResearchOutput[]> => {
+  const absoluteUrl = await getAbsoluteUrl('/research');
+  const response = await fetch(absoluteUrl, {
+    method: 'GET',
+  });
+  return response.json();
+}
+
+export const getResearchById = async (researchId: string): Promise<RequestResearchOutput | null> => {
+  const absoluteUrl = await getAbsoluteUrl(`/research/${researchId}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
@@ -49,13 +43,13 @@ export const getDeepResearch = async (): Promise<DeepResearchResponse[]> => {
     }
     return response.json();
   } catch (error) {
-    console.error('Error fetching deep research:', error);
-    return [];
+    console.error('Error fetching research:', error);
+    return null;
   }
 }
 
-export const postDeepResearch = async (requestData: DeepResearchRequest): Promise<DeepResearchResponse> => {
-  const absoluteUrl = await getAbsoluteUrl('/deep-research');
+export const postResearch = async (requestData: RequestResearchInput): Promise<RequestResearchOutput> => {
+  const absoluteUrl = await getAbsoluteUrl('/research');
   try {
     const response = await fetch(absoluteUrl, {
       method: 'POST',
@@ -65,12 +59,12 @@ export const postDeepResearch = async (requestData: DeepResearchRequest): Promis
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
-      throw new Error(`Failed to post deep research: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(`Failed to post research: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     return response.json();
   } catch (error) {
-    console.error('Error posting deep research:', error);
+    console.error('Error posting research:', error);
     throw error;
   }
 }

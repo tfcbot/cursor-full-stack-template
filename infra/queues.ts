@@ -3,12 +3,12 @@ import { secrets } from "./secrets"
 
 
 
-export const deepResearchQueue = new sst.aws.Queue("DeepResearchQueue")   
+export const researchQueue = new sst.aws.Queue("ResearchQueue")   
 
 
 
-deepResearchQueue.subscribe({
-    handler: "./packages/functions/src/agent-runtime.api.deepResearchHandler", 
+researchQueue.subscribe({
+    handler: "./packages/functions/src/agent-runtime.api.researchHandler", 
     link: [
         researchTable, 
         ...secrets, 

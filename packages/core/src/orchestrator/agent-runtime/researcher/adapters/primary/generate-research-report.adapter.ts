@@ -1,6 +1,6 @@
 import { createSqsAdapter } from "@lib/sqs-adapter.factory";
-import { RequestDeepResearchInputSchema } from "@metadata/agents/deep-research-agent.schema";
-import { runDeepResearchUsecase } from "@agent-runtime/deep-researcher/usecase/deep-research.usecase";
+import { RequestResearchInputSchema } from "@metadata/agents/research-agent.schema";
+import { runResearchUsecase } from "@agent-runtime/researcher/usecase/research.usecase";
 
 /**
  * Research Report Generator SQS Adapter
@@ -13,8 +13,8 @@ import { runDeepResearchUsecase } from "@agent-runtime/deep-researcher/usecase/d
  */
 
 export const createResearchReportAdapter = createSqsAdapter({
-  schema: RequestDeepResearchInputSchema,
-  useCase: runDeepResearchUsecase,
+  schema: RequestResearchInputSchema,
+  useCase: runResearchUsecase,
   adapterName: 'RESEARCH-REPORT-GENERATOR',
   options: {
     verboseLogging: true,

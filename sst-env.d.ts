@@ -13,10 +13,6 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
-    "DeepResearchQueue": {
-      "type": "sst.aws.Queue"
-      "url": string
-    }
     "MyWeb": {
       "type": "sst.aws.Nextjs"
       "url": string
@@ -28,6 +24,10 @@ declare module "sst" {
     "Research": {
       "name": string
       "type": "sst.aws.Dynamo"
+    }
+    "ResearchQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
     }
   }
 }

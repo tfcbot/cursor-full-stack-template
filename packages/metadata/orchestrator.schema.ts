@@ -1,5 +1,5 @@
 export enum Queue {
-    deepResearch = 'deepResearch',
+    research = 'research',
 }
 
 export enum Topic {

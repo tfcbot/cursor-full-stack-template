@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useGetAllDeepResearch } from '../api';
+import { useGetAllResearch } from '../api';
 
 export function ResearchList() {
-  const { data: researchList, isLoading, isError } = useGetAllDeepResearch();
+  const { data: researchList, isLoading, isError } = useGetAllResearch();
   
   if (isLoading) {
     return (

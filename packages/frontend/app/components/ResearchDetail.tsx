@@ -1,10 +1,11 @@
 'use client';
 
-import { useGetDeepResearch } from '../api';
+import { useGetResearchById } from '@/hooks/useResearchHooks';
+
 import Link from 'next/link';
 
 export function ResearchDetail({ researchId }: { researchId: string }) {
-  const { data: research, isLoading, isError } = useGetDeepResearch(researchId);
+  const { data: research, isLoading, isError } = useGetResearchById(researchId);
   
   if (isLoading) {
     return (

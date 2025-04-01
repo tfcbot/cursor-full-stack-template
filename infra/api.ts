@@ -21,15 +21,15 @@ export const apiResources = [
 ]
 
 
-api.route("GET /deep-research", {
+api.route("GET /research", {
   link: [...apiResources],
   handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
 })
 
 
-api.route("POST /deep-research", {
+api.route("POST /research", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.requestDeepResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.requestResearchHandler",
 })
 
 
