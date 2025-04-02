@@ -28,10 +28,10 @@ researchQueue.subscribe({
       TaskTopic
   ], 
   permissions: [
-      {
-          actions: ["dynamodb:*"], 
-          resources: [researchTable.arn]
-      }, 
+    {
+      actions: ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Query"], 
+      resources: [researchTable.arn]
+    }, 
   ],
 })
 

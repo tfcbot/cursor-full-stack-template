@@ -1,11 +1,13 @@
 import { 
     researchTable
- } from "./database";
+} from "./database";
 
 import { 
   secrets,
  } from "./secrets";
-import { TaskTopic, researchQueue } from "./orchestrator";
+import { 
+  TaskTopic, researchQueue 
+} from "./orchestrator";
 
 
 export const api = new sst.aws.ApiGatewayV2('BackendApi')

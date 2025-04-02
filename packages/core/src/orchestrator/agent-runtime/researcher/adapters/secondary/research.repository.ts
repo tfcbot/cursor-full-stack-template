@@ -2,6 +2,7 @@ import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@a
 import { randomUUID } from 'crypto';
 import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
 import { ValidUser } from '@metadata/saas-identity.schema';
+import { Resource } from 'sst';
 
 export interface ResearchRepository {
   saveResearch(research: RequestResearchOutput): Promise<string>;
@@ -12,8 +13,8 @@ export interface ResearchRepository {
 export const createResearchRepository = (
   dynamoDbClient: DynamoDBDocumentClient
 ): ResearchRepository => {
-  const tableName = process.env.RESEARCH_TABLE_NAME || 'ResearchTable';
-
+  const tableName = Resource.Research.name
+  console.info("Saving research to table", tableName);
   return {
     async saveResearch(research: RequestResearchOutput): Promise<string> {
 

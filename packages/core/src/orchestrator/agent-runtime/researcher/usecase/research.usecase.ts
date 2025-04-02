@@ -10,12 +10,11 @@ export const runResearchUsecase = async (input: RequestResearchInput): Promise<M
   try {
     const research = await runResearch(input);
     console.info("Research completed successfully");
-
-    await researchRepository.saveResearch(research);
+    const message = await researchRepository.saveResearch(research);
+    console.info("Research saved successfully");
     return {
-      message: 'Research completed successfully',
+      message: message
     };
-
   } catch (error) {
     console.error('Error performing research:', error);
     throw new Error('Failed to perform research');

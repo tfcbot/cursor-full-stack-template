@@ -24,7 +24,7 @@ export const getResearchUsecase = async (input: GetResearchInput): Promise<Messa
   console.info("Getting research for prompt");
 
   try {
-    const research = await researchRepository.getResearchByUserId(input.userId);
+    const research = await researchRepository.getResearchById(input.researchId);
     return {
       message: 'Research completed successfully',
       data: research,
