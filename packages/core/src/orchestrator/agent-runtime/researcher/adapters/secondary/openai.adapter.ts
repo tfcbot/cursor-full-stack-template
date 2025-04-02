@@ -8,12 +8,12 @@ const client = new OpenAI({
   apiKey: Resource.OpenAiApiKey.value
 });
 
-export const createContent = async (input: RequestResearchInput): Promise<RequestResearchOutput> => {
+export const executeResearch = async (input: RequestResearchInput): Promise<RequestResearchOutput> => {
   try {
     // Construct the prompt
    
     const response = await client.responses.create({
-      model: "gpt-4.5-preview",
+      model: "gpt-4o",
       tools: [{
         type: "web_search_preview"
       }],
@@ -37,7 +37,7 @@ export const createContent = async (input: RequestResearchInput): Promise<Reques
 };
 
 // Keep the existing retry wrapper
-export const runContent = withRetry(createContent, { 
+export const runResearch = withRetry(executeResearch, { 
   retries: 3, 
   delay: 1000, 
   onRetry: (error: Error) => console.warn('Retrying content generation due to error:', error) 

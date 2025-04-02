@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 export const RequestResearchInputSchema = z.object({
     prompt: z.string(),
+    id: z.string().default(randomUUID()),
 });
 
 export const systemPrompt = `

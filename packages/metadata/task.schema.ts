@@ -7,7 +7,9 @@ export const AgentMessageSchema = z.object({
   id: z.string(),
   timestamp: z.string(),
   queue: z.string(),
-  payload: z.any(),
+  payload: z.object({
+    id: z.string(),
+  })
 });
 
 export type AgentMessage = z.infer<typeof AgentMessageSchema>;

@@ -12,7 +12,7 @@ import { runResearchUsecase } from "@agent-runtime/researcher/usecase/research.u
  * - Parallel processing of messages
  */
 
-export const createResearchReportAdapter = createSqsAdapter({
+export const generateResearchReportAdapter = createSqsAdapter({
   schema: RequestResearchInputSchema,
   useCase: runResearchUsecase,
   adapterName: 'RESEARCH-REPORT-GENERATOR',

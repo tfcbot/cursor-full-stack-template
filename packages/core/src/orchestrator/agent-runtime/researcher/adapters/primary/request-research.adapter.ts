@@ -55,7 +55,7 @@ const researchEventParser: EventParser<RequestResearchInput> = (
 const researchAdapterOptions: LambdaAdapterOptions = {
   requireAuth: false,
   requireBody: true,
-  requiredFields: ['prompt', 'contentType']
+  requiredFields: ['prompt']
 };
 
 
@@ -70,10 +70,7 @@ const publishMessageUsecase = async (input: RequestResearchInput) => {
     id: randomUUID(),
     timestamp: new Date().toISOString(),
     queue: Queue.research,
-    payload: {
-      id: randomUUID(),
-      message: input 
-    }
+    payload: input
   });
 }
 

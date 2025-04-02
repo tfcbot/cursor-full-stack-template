@@ -12,12 +12,12 @@ export class TopicPublisher {
   constructor() {
     this.snsClient = new SNSClient({});
     this.topicArns = {
-        [Topic.agent]: Resource.AgentTopic.arn,
+        [Topic.task]: Resource.TaskTopic.arn
     };
   }
 
   async publishAgentMessage(message: AgentMessage): Promise<void> {
-    const topicArn = this.topicArns[Topic.agent];
+    const topicArn = this.topicArns[Topic.task];
     console.log("--- Publishing agent message to topic ---");
     try {
       await this.snsClient.send(new PublishCommand({

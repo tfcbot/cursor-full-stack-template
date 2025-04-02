@@ -5,10 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "AgentTopic": {
-      "arn": string
-      "type": "sst.aws.SnsTopic"
-    }
     "BackendApi": {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
@@ -28,6 +24,10 @@ declare module "sst" {
     "ResearchQueue": {
       "type": "sst.aws.Queue"
       "url": string
+    }
+    "TaskTopic": {
+      "arn": string
+      "type": "sst.aws.SnsTopic"
     }
   }
 }

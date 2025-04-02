@@ -8,9 +8,8 @@ dotenv.config({ path: resolve(process.cwd(), '.env.test') });
 // Set up Bun test environment
 export default {
   test: {
-    timeout: 2000, // Set timeout to 2 seconds
+    timeout: 10000, // Set timeout to 10 seconds for API calls
     environment: 'node',
-    include: ['**/*.test.ts', '**/tests/**/*.test.ts'],
     coverage: {
       enabled: process.env.COVERAGE === 'true',
       reporter: ['text', 'lcov'],

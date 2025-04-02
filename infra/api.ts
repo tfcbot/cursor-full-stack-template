@@ -1,23 +1,25 @@
 import { 
     researchTable
  } from "./database";
+
 import { 
   secrets,
  } from "./secrets";
-import { AgentTopic } from "./topic";
+import { TaskTopic, researchQueue } from "./orchestrator";
 
 
 export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
-const topics = [AgentTopic]
+const topics = [TaskTopic]
 const tables = [researchTable]
-
+const queues = [researchQueue]
 
 export const apiResources = [
   ...topics,
   ...tables,
   ...secrets,
+  ...queues
 ]
 
 

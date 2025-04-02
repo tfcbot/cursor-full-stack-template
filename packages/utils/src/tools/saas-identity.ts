@@ -1,5 +1,6 @@
 import { ValidUser } from '@metadata/saas-identity.schema'
 import { ISaasIdentityVendingMachine } from '@metadata/saas-identity.schema';
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
 
 
 
@@ -17,7 +18,7 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
     }
 
 
-    async getValidUser(): Promise<ValidUser> {
+    async getValidUser(event: APIGatewayProxyEventV2): Promise<ValidUser> {
         return {} as ValidUser;
     }
 }

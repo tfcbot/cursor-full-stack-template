@@ -1,13 +1,12 @@
 import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
 import { Message } from '@metadata/message.schema';
-
+import { runResearch } from '../adapters/secondary/openai.adapter';
 export const runResearchUsecase = async (input: RequestResearchInput): Promise<Message> => {
   console.info("Performing research for User");
 
   try {
-    // TODO: Implement research functionality
-    // This will need to be replaced with actual research implementation
-
+    const research = await runResearch(input);
+    console.info("Research completed successfully", research);
     return {
       message: 'Research completed successfully',
     };

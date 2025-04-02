@@ -3,5 +3,5 @@ export enum Queue {
 }
 
 export enum Topic {
-  agent = 'agent',
+  task = 'task',
 }

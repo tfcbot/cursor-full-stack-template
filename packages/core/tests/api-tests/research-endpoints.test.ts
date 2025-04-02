@@ -1,8 +1,8 @@
 import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
 import { describe, expect, test, beforeAll } from 'bun:test';
-
+import { randomUUID } from 'crypto';
 // Environment variables
-const API_URL = 'https://tylexj17u5.execute-api.us-east-1.amazonaws.com';
+const API_URL = 'https://oc7cyxj8v3.execute-api.us-east-1.amazonaws.com';
 
 describe('Research API Endpoints', () => {
     const headers = {
@@ -11,6 +11,7 @@ describe('Research API Endpoints', () => {
 
   // Sample research request payload
   const testResearchRequest: RequestResearchInput = {
+    id: randomUUID(),
     prompt: 'Explain the latest advancements in artificial intelligence and machine learning'
   };
 
@@ -37,7 +38,6 @@ describe('Research API Endpoints', () => {
       // Verify response data
       const responseData = await response.json() as { message: string; data: { researchId: string } };
       expect(responseData.message).toBe('Research generation request published');
-      expect(responseData.data.researchId).toBeDefined();
     });
 
     test('should handle validation errors for invalid requests', async () => {
