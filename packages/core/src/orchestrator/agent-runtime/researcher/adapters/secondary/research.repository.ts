@@ -1,7 +1,5 @@
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { randomUUID } from 'crypto';
-import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
-import { ValidUser } from '@metadata/saas-identity.schema';
+import { RequestResearchOutput, RequestResearchOutputSchema } from '@metadata/agents/research-agent.schema';
 import { Resource } from 'sst';
 
 export interface ResearchRepository {
@@ -42,12 +40,7 @@ export const createResearchRepository = (
         return null;
       }
 
-      return {
-        researchId: response.Item.researchId,
-        title: response.Item.title,
-        content: response.Item.content,
-        createdAt: response.Item.createdAt,
-      };
+      return RequestResearchOutputSchema.parse(response.Item);
     },
 
     async getResearchByUserId(userId: string): Promise<RequestResearchOutput[]> {
@@ -66,12 +59,7 @@ export const createResearchRepository = (
         return [];
       }
 
-      return response.Items.map((item) => ({
-        researchId: item.researchId,
-        title: item.title,
-        content: item.content,
-        createdAt: item.createdAt,
-      }));
+      return response.Items.map((item) => RequestResearchOutputSchema.parse(item));
     },
   };
 };

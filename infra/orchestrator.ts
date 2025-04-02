@@ -29,8 +29,16 @@ researchQueue.subscribe({
   ], 
   permissions: [
     {
-      actions: ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:Query"], 
-      resources: [researchTable.arn]
+      actions: [
+        "dynamodb:PutItem", 
+        "dynamodb:GetItem", 
+        "dynamodb:Query",
+        "sqs:DeleteMessage"
+      ], 
+      resources: [
+        researchTable.arn,
+        researchQueue.arn
+      ]
     }, 
   ],
 })

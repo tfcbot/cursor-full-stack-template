@@ -9,6 +9,8 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda';
 import { ZodSchema, z } from 'zod';
 import { handleError } from '@utils/tools/custom-error';
+import { DeleteMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
+import { Resource } from 'sst';
 
 /**
  * Configuration options for the SQS adapter.
@@ -25,6 +27,28 @@ export interface SqsAdapterOptions {
   
   /** Whether to include detailed logging. Default: false */
   verboseLogging?: boolean;
+}
+
+// Initialize SQS client
+const sqsClient = new SQSClient({});
+
+// Helper function to get Queue URL from ARN
+function getQueueUrlFromArn(arnString: string): string {
+  try {
+    // ARN format: arn:aws:sqs:region:account-id:queue-name
+    const parts = arnString.split(':');
+    if (parts.length < 6) {
+      throw new Error('Invalid ARN format');
+    }
+    const region = parts[3];
+    const accountId = parts[4];
+    const queueName = parts[5];
+    
+    return `https://sqs.${region}.amazonaws.com/${accountId}/${queueName}`;
+  } catch (error) {
+    console.error('Error parsing Queue ARN:', error);
+    throw error;
+  }
 }
 
 /**
@@ -177,19 +201,29 @@ export const createSqsAdapter = <
           // Use Zod schema to parse and validate the message in one step
           const validatedInput = schema.parse(rawMessage) as TInput;
           
-          // Log with safe access to orderId if it exists
-          if (typeof validatedInput === 'object' && validatedInput !== null) {
-            const orderId = 'orderId' in validatedInput ? (validatedInput as any).orderId : 'N/A';
-            console.info(`${logPrefix} Processing request:`, { orderId });
-          } else {
-            console.info(`${logPrefix} Processing request`);
-          }
+          console.info(`${logPrefix} Processing request`);
+       
           
           // Execute the use case with the parsed and validated input
           const result = await useCase(validatedInput);
           
           if (mergedOptions.verboseLogging) {
             console.log(`${logPrefix} Successfully processed request`);
+          }
+
+          if (!record.eventSourceARN) {
+            throw new Error('Missing eventSourceARN in SQS record');
+          }
+
+          // Delete the message after successful processing using proper Queue URL format
+          const queueUrl = getQueueUrlFromArn(record.eventSourceARN);
+          await sqsClient.send(new DeleteMessageCommand({
+            QueueUrl: queueUrl,
+            ReceiptHandle: record.receiptHandle
+          }));
+          
+          if (mergedOptions.verboseLogging) {
+            console.log(`${logPrefix} Successfully deleted message from queue:`);
           }
           
           return result;

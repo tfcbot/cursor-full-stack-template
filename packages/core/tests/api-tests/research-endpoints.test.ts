@@ -15,14 +15,6 @@ describe('Research API Endpoints', () => {
     prompt: 'Explain the latest advancements in artificial intelligence and machine learning'
   };
 
-  // Sample research response data
-  const sampleResearchData: RequestResearchOutput = {
-    researchId: 'test-research-123',
-    title: 'Advancements in AI and ML',
-    content: 'This is a comprehensive research on the latest advancements in AI and ML...',
-    createdAt: new Date().toISOString()
-  };
-
   describe('POST /research endpoint', () => {
     test('should successfully submit a research request', async () => {
       console.log(API_URL);
@@ -79,7 +71,7 @@ describe('Research API Endpoints', () => {
         expect(firstResearch.researchId).toBeDefined();
         expect(firstResearch.title).toBeDefined();
         expect(firstResearch.content).toBeDefined();
-        expect(firstResearch.createdAt).toBeDefined();
+        expect(firstResearch.citation_links).toBeDefined();
       }
     });
 
@@ -98,7 +90,7 @@ describe('Research API Endpoints', () => {
         expect(researchData.researchId).toBeDefined();
         expect(researchData.title).toBeDefined();
         expect(researchData.content).toBeDefined();
-        expect(researchData.createdAt).toBeDefined();
+        expect(researchData.citation_links).toBeDefined();
       } else {
         // If not found, that's also a valid response
         expect(response.status).toBe(404);

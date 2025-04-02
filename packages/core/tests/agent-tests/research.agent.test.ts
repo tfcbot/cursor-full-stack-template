@@ -1,5 +1,10 @@
-import { RequestResearchInputSchema, RequestResearchOutputSchema } from '@metadata/agents/research-agent.schema';
-import { describe, expect, test } from 'bun:test';
+import { RequestResearchInputSchema, RequestResearchOutputSchema, systemPrompt, userPromt } from '@metadata/agents/research-agent.schema';
+import { zodToOpenAIFormat } from '@utils/vendors/openai/schema-helpers';
+import { describe, expect, test, mock } from 'bun:test';
+import OpenAI from 'openai';
+import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
+
 
 describe('Research Agent Schema Validation', () => {
   const validInput = {
@@ -10,7 +15,7 @@ describe('Research Agent Schema Validation', () => {
     researchId: 'test-id-123',
     title: 'Recent Developments in LLMs',
     content: 'This is a research content about large language models and their applications. It contains information about recent advancements and use cases.',
-    createdAt: new Date().toISOString()
+    citation_links: ['https://example.com', 'https://example2.com']
   };
 
   test('should validate input against schema', () => {
@@ -39,24 +44,24 @@ describe('Research Agent Schema Validation', () => {
     expect(() => RequestResearchOutputSchema.parse({
       title: 'Test Title',
       content: 'Test Content',
-      createdAt: new Date().toISOString()
+      citation_links: ['https://example.com']
     })).toThrow();
     
     // Missing title
     expect(() => RequestResearchOutputSchema.parse({
       researchId: 'test-id',
       content: 'Test Content',
-      createdAt: new Date().toISOString()
+      citation_links: ['https://example.com']
     })).toThrow();
     
     // Missing content
     expect(() => RequestResearchOutputSchema.parse({
       researchId: 'test-id',
       title: 'Test Title',
-      createdAt: new Date().toISOString()
+      citation_links: ['https://example.com']
     })).toThrow();
     
-    // Missing createdAt
+    // Missing citation_links
     expect(() => RequestResearchOutputSchema.parse({
       researchId: 'test-id',
       title: 'Test Title',
@@ -83,10 +88,84 @@ describe('Research Agent Schema Validation', () => {
       content: 123
     })).toThrow();
     
-    // createdAt must be string
+    // citation_links must be array of strings
     expect(() => RequestResearchOutputSchema.parse({
       ...validOutput,
-      createdAt: 123
+      citation_links: 'https://example.com'
     })).toThrow();
   });
+
+  test('should return a research output', async () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    console.debug('Starting research test with API key:', apiKey ? 'Present' : 'Missing');
+
+    const client = new OpenAI({
+      apiKey
+    });
+
+    const validInputWithId = {
+      ...validInput,
+      id: randomUUID()
+    };
+   
+
+    // Add breakpoint here before API calls
+
+    const response = await client.responses.create({
+      model: "gpt-4o",
+      tools: [{
+        type: "web_search_preview", 
+        search_context_size: "high",
+      }],
+      instructions: systemPrompt,
+      input: [
+        {"role": "user", "content": userPromt(validInputWithId)}
+      ],
+      tool_choice: "required"
+    });
+    
+    const title = await client.responses.create({
+      model: "gpt-4o-mini",
+      input: [
+        {"role": "user", "content": `Generate a title for the following research: ${response.output_text}`}
+      ],
+    });
+   
+
+    const citationsSchema = z.object({
+      citations: z.array(z.string())
+    });
+    const extractCitations = await client.responses.create({
+      model: "gpt-4o",
+      input: [
+        {"role": "user", "content": `Extract the citations from the following research: ${response.output_text}`}
+      ], 
+      text: zodToOpenAIFormat(citationsSchema, "citation_links")
+    });
+   
+
+    const citationLinks = JSON.parse(extractCitations.output_text);
+
+    const content = RequestResearchOutputSchema.parse({
+      researchId: validInputWithId.id,
+      title: title.output_text,
+      content: response.output_text,
+      citation_links: citationLinks.citations
+    });
+    
+  }, {timeout: 50000});
+
 }); 
+
+interface WebSearchMetadata {
+  url: string;
+  title: string;
+  snippet: string;
+}
+
+interface WebSearchToolCall {
+  type: 'web_search';
+  web_search?: {
+    metadata: WebSearchMetadata;
+  };
+}

@@ -16,7 +16,6 @@ export const runResearchUsecase = async (input: RequestResearchInput): Promise<M
       message: message
     };
   } catch (error) {
-    console.error('Error performing research:', error);
-    throw new Error('Failed to perform research');
+    throw new Error('Failed to perform research', { cause: error }  );
   }
 };

@@ -8,10 +8,10 @@
     ]
   },
   "scripts": {
-    "test": "bun test --timeout 2000",
-    "test:silent": "bun test --silent --timeout 2000",
-    "test:unit": "bun test tests/agent-tests/ --timeout 2000",
-    "test:api": "bun test tests/api-tests/research-endpoints.test.ts --timeout 10000"
+    "test": "bun test --preload ./tests/setup.ts --timeout 2000",
+    "test:silent": "bun test --preload ./tests/setup.ts --silent --timeout 2000",
+    "test:unit": "bun test --preload ./tests/setup.ts tests/agent-tests/ --timeout 2000",
+    "test:api": "bun test --preload ./tests/setup.ts tests/api-tests/research-endpoints.test.ts --timeout 10000"
   },
   "dependencies": {
     "@aws-lambda-powertools/idempotency": "^2.3.0",
