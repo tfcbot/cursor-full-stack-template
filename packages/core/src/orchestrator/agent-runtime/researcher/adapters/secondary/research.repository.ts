@@ -4,7 +4,7 @@ import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/re
 import { ValidUser } from '@metadata/saas-identity.schema';
 
 export interface ResearchRepository {
-  saveResearch(userId: string, research: RequestResearchOutput, prompt: string): Promise<string>;
+  saveResearch(research: RequestResearchOutput): Promise<string>;
   getResearchById(researchId: string): Promise<RequestResearchOutput | null>;
   getResearchByUserId(userId: string): Promise<RequestResearchOutput[]>;
 }
@@ -15,25 +15,16 @@ export const createResearchRepository = (
   const tableName = process.env.RESEARCH_TABLE_NAME || 'ResearchTable';
 
   return {
-    async saveResearch(userId: string, research: RequestResearchOutput, prompt: string): Promise<string> {
-      const researchId = randomUUID();
-      const timestamp = new Date().toISOString();
+    async saveResearch(research: RequestResearchOutput): Promise<string> {
 
       await dynamoDbClient.send(
         new PutCommand({
           TableName: tableName,
-          Item: {
-            researchId,
-            userId,
-            research: research.research,
-            prompt,
-            createdAt: timestamp,
-            updatedAt: timestamp,
-          },
+          Item: research
         })
       );
 
-      return researchId;
+      return "Research saved successfully";
     },
 
     async getResearchById(researchId: string): Promise<RequestResearchOutput | null> {
@@ -51,8 +42,10 @@ export const createResearchRepository = (
       }
 
       return {
-        userId: response.Item.userId,
-        research: response.Item.research,
+        researchId: response.Item.researchId,
+        title: response.Item.title,
+        content: response.Item.content,
+        createdAt: response.Item.createdAt,
       };
     },
 
@@ -73,8 +66,10 @@ export const createResearchRepository = (
       }
 
       return response.Items.map((item) => ({
-        userId: item.userId,
-        research: item.research,
+        researchId: item.researchId,
+        title: item.title,
+        content: item.content,
+        createdAt: item.createdAt,
       }));
     },
   };
