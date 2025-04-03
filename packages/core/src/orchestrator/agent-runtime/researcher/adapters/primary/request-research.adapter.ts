@@ -66,7 +66,7 @@ const researchAdapterOptions: LambdaAdapterOptions = {
  */
 const publishMessageUsecase = async (input: RequestResearchInput) => {
   topicPublisher.publishAgentMessage({
-    topic: Topic.agent,
+    topic: Topic.task,
     id: randomUUID(),
     timestamp: new Date().toISOString(),
     queue: Queue.research,

@@ -1,4 +1,4 @@
-import { RequestResearchInputSchema, RequestResearchOutputSchema, systemPrompt, userPromt } from '@metadata/agents/research-agent.schema';
+import { citationsSchema, RequestResearchInputSchema, RequestResearchOutputSchema, systemPrompt, userPromt } from '@metadata/agents/research-agent.schema';
 import { zodToOpenAIFormat } from '@utils/vendors/openai/schema-helpers';
 import { describe, expect, test, mock } from 'bun:test';
 import OpenAI from 'openai';
@@ -132,9 +132,6 @@ describe('Research Agent Schema Validation', () => {
     });
    
 
-    const citationsSchema = z.object({
-      citations: z.array(z.string())
-    });
     const extractCitations = await client.responses.create({
       model: "gpt-4o",
       input: [
@@ -143,14 +140,12 @@ describe('Research Agent Schema Validation', () => {
       text: zodToOpenAIFormat(citationsSchema, "citation_links")
     });
    
-
-    const citationLinks = JSON.parse(extractCitations.output_text);
-
+    const citations = citationsSchema.parse(JSON.parse(extractCitations.output_text) );
     const content = RequestResearchOutputSchema.parse({
       researchId: validInputWithId.id,
       title: title.output_text,
       content: response.output_text,
-      citation_links: citationLinks.citations
+      citation_links: citations.links
     });
     
   }, {timeout: 50000});
