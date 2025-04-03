@@ -26,10 +26,35 @@ export const getHeaders = async (): Promise<HeadersInit> => {
 
 export const getAllResearch = async (): Promise<RequestResearchOutput[]> => {
   const absoluteUrl = await getAbsoluteUrl('/research');
-  const response = await fetch(absoluteUrl, {
-    method: 'GET',
-  });
-  return response.json();
+  try {
+    const response = await fetch(absoluteUrl, {
+      method: 'GET',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch research: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Handle different response formats
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && typeof data === 'object') {
+      if (Array.isArray(data.data)) {
+        return data.data;
+      } else if (data.body && Array.isArray(data.body)) {
+        return data.body;
+      }
+    }
+    
+    // If we reach here, the response format was unexpected
+    console.error('Unexpected response format from getAllResearch:', data);
+    return [];
+  } catch (error) {
+    console.error('Error fetching all research:', error);
+    return [];
+  }
 }
 
 export const getResearchById = async (researchId: string): Promise<RequestResearchOutput | null> => {

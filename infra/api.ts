@@ -30,6 +30,11 @@ api.route("GET /research", {
   handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
 })
 
+// Add a route for getting a specific research item by ID
+api.route("GET /research/{id}", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
+})
 
 api.route("POST /research", {
   link: [...apiResources],

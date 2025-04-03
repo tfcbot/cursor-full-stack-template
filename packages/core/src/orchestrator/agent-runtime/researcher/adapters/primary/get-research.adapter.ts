@@ -12,38 +12,42 @@ import {
   EventParser,
   LambdaAdapterOptions 
 } from '@lib/lambda-adapter.factory';
-import { randomUUID } from 'crypto';
 import { GetResearchInput, GetResearchInputSchema } from '@metadata/agents/research-agent.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
 import { getResearchUsecase } from '@agent-runtime/researcher/usecase/get-research.usecase';
+import { getAllResearchUsecase } from '../../../researcher/usecase/get-all-research.usecase';
+import { z } from 'zod';
 
+// Create a custom schema that can handle both null (for all research) and GetResearchInput (for specific ID)
+const ResearchRequestSchema = z.union([
+  GetResearchInputSchema,
+  z.literal(null)
+]);
 
-
+// Define the type based on the schema
+type ResearchRequest = z.infer<typeof ResearchRequestSchema>;
 
 /**
  * Parser function that transforms the API Gateway event into the format
  * expected by the research use case
  */
-const getResearchEventParser: EventParser<GetResearchInput> = (
+const getResearchEventParser: EventParser<ResearchRequest> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
-  // Parse the request body
-  if (!event.body) {
-    throw new Error("Missing request body");
+  // Check if this is a request for a specific research item or all research
+  const researchId = event.pathParameters?.id;
+  
+  // If no ID is provided, return null to indicate we want all research
+  if (!researchId) {
+    return null;
   }
   
-  const eventBody = JSON.parse(event.body);
-  
-  // Generate IDs manually
-  const orderId = randomUUID();
-  const deliverableId = randomUUID();
-  
+  // Return the specific research request
   return {
     userId: validUser.userId,
-    researchId: eventBody.researchId,
-    prompt: eventBody.prompt
+    researchId: researchId
   };
 };
 
@@ -52,23 +56,29 @@ const getResearchEventParser: EventParser<GetResearchInput> = (
  */
 const researchAdapterOptions: LambdaAdapterOptions = {
   requireAuth: false,
-  requireBody: true,
-  requiredFields: ['researchId']
+  requireBody: false // GET requests don't have a body
 };
-
 
 /**
  * Lambda adapter for handling research requests
  * 
  * This adapter:
- * 1. Validates the request body
- * 2. Parses and validates the input using the schema
- * 3. Executes the research use case
+ * 1. Checks if this is a request for all research or a specific research item
+ * 2. Validates the input using the schema if applicable
+ * 3. Executes the appropriate research use case
  * 4. Formats and returns the response
  */
 export const getResearchAdapter = createLambdaAdapter({
-  schema: GetResearchInputSchema,
-  useCase: getResearchUsecase,
+  schema: ResearchRequestSchema, // Use our union schema to handle both null and input object
+  useCase: async (input: ResearchRequest) => {
+    // If input is null, get all research
+    if (input === null) {
+      return await getAllResearchUsecase();
+    }
+    
+    // Otherwise, get specific research
+    return await getResearchUsecase(input);
+  },
   eventParser: getResearchEventParser,
   options: researchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
