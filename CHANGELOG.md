@@ -5,8 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.1] - Unreleased
+## [0.0.2] - Unreleased
+
+### Added
+- TBD
+
+## [0.0.1] - 2024-04-03
 
 ### Added
 - Initial project setup
-- AWS S3 bucket infrastructure configuration 
+- AWS S3 bucket infrastructure configuration
+- Research API endpoints
+- Frontend integration with backend services
+- Fixed API validation for GET requests
+- Improved error handling for research queries 
