@@ -1,7 +1,45 @@
-import { bucket } from "./storage";
+import { 
+    researchTable
+} from "./database";
 
-export const myApi = new sst.aws.Function("MyApi", {
-  url: true,
-  link: [bucket],
-  handler: "packages/functions/src/api.handler"
-});
+import { 
+  secrets,
+ } from "./secrets";
+import { 
+  TaskTopic, researchQueue 
+} from "./orchestrator";
+
+
+export const api = new sst.aws.ApiGatewayV2('BackendApi')
+
+
+const topics = [TaskTopic]
+const tables = [researchTable]
+const queues = [researchQueue]
+
+export const apiResources = [
+  ...topics,
+  ...tables,
+  ...secrets,
+  ...queues
+]
+
+
+api.route("GET /research", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
+})
+
+// Add a route for getting a specific research item by ID
+api.route("GET /research/{id}", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
+})
+
+api.route("POST /research", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/agent-runtime.api.requestResearchHandler",
+})
+
+
+
