@@ -4,8 +4,8 @@ import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { ArtifactKind, UIArtifact } from '../../hooks/useArtifactHooks';
 
 export type DataStreamDelta = {
-  type: 'text-delta' | 'code-delta' | 'title' | 'id' | 'finish' | 'kind';
-  content: string;
+  type: 'text-delta' | 'code-delta' | 'title' | 'id' | 'finish' | 'kind' | 'clear' | 'suggestion';
+  content: string | any;
 };
 
 export interface ArtifactContent<M = any> {

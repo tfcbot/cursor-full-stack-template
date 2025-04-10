@@ -6,6 +6,7 @@ import { UIArtifact } from '../../../hooks/useArtifactHooks';
 
 interface CodeArtifactMetadata {
   language: string;
+  suggestions: Array<string>;
 }
 
 export const codeArtifact = new Artifact<'code', CodeArtifactMetadata>({
@@ -15,16 +16,33 @@ export const codeArtifact = new Artifact<'code', CodeArtifactMetadata>({
   initialize: async ({ researchId, setMetadata }) => {
     setMetadata({
       language: 'javascript',
+      suggestions: [],
     });
   },
   
   onStreamPart: ({ streamPart, setMetadata, setArtifact }) => {
+    if (streamPart.type === 'suggestion') {
+      setMetadata((metadata) => {
+        return {
+          ...metadata,
+          suggestions: [
+            ...(metadata.suggestions || []),
+            streamPart.content as string,
+          ],
+        };
+      });
+    }
+    
     if (streamPart.type === 'code-delta') {
       setArtifact((draftArtifact) => {
         return {
           ...draftArtifact,
           content: streamPart.content as string,
-          isVisible: draftArtifact.status === 'streaming',
+          isVisible: 
+            draftArtifact.status === 'streaming' &&
+            draftArtifact.content.length > 100
+              ? true
+              : draftArtifact.isVisible,
           status: 'streaming',
         };
       });
@@ -44,6 +62,16 @@ export const codeArtifact = new Artifact<'code', CodeArtifactMetadata>({
         return {
           ...draftArtifact,
           researchId: streamPart.content as string,
+        };
+      });
+    }
+    
+    if (streamPart.type === 'clear') {
+      setArtifact((draftArtifact) => {
+        return {
+          ...draftArtifact,
+          content: '',
+          status: 'streaming',
         };
       });
     }
@@ -81,6 +109,17 @@ export const codeArtifact = new Artifact<'code', CodeArtifactMetadata>({
         <pre className="bg-bg-tertiary p-4 rounded-md overflow-x-auto">
           <code className={`language-${metadata.language}`}>{content}</code>
         </pre>
+        
+        {metadata?.suggestions && metadata.suggestions.length > 0 && (
+          <div className="mt-8 border-t border-border pt-4">
+            <h3 className="text-lg font-semibold mb-2">Suggestions</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              {metadata.suggestions.map((suggestion, index) => (
+                <li key={index} className="text-fg-secondary">{suggestion}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   },

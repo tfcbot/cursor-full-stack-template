@@ -19,12 +19,28 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
   },
   
   onStreamPart: ({ streamPart, setMetadata, setArtifact }) => {
+    if (streamPart.type === 'suggestion') {
+      setMetadata((metadata) => {
+        return {
+          suggestions: [
+            ...metadata.suggestions,
+            streamPart.content as string,
+          ],
+        };
+      });
+    }
+    
     if (streamPart.type === 'text-delta') {
       setArtifact((draftArtifact) => {
         return {
           ...draftArtifact,
           content: draftArtifact.content + (streamPart.content as string),
-          isVisible: draftArtifact.status === 'streaming',
+          isVisible: 
+            draftArtifact.status === 'streaming' &&
+            draftArtifact.content.length > 400 &&
+            draftArtifact.content.length < 450
+              ? true
+              : draftArtifact.isVisible,
           status: 'streaming',
         };
       });
@@ -44,6 +60,16 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
         return {
           ...draftArtifact,
           researchId: streamPart.content as string,
+        };
+      });
+    }
+    
+    if (streamPart.type === 'clear') {
+      setArtifact((draftArtifact) => {
+        return {
+          ...draftArtifact,
+          content: '',
+          status: 'streaming',
         };
       });
     }
@@ -85,6 +111,17 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
             </p>
           ))}
         </div>
+        
+        {metadata?.suggestions && metadata.suggestions.length > 0 && (
+          <div className="mt-8 border-t border-border pt-4">
+            <h3 className="text-lg font-semibold mb-2">Suggestions</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              {metadata.suggestions.map((suggestion, index) => (
+                <li key={index} className="text-fg-secondary">{suggestion}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   },

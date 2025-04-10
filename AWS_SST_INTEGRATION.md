@@ -1,6 +1,6 @@
 # AWS/SST Backend Integration Guide
 
-This guide explains how to integrate the backend with AWS using the Serverless Stack (SST) framework in this template.
+This guide explains how to integrate the backend with AWS using the Serverless Stack (SST) framework in this template, including streaming artifact support.
 
 ## Overview
 
@@ -11,6 +11,7 @@ The template uses a serverless architecture powered by AWS services and orchestr
 - **DynamoDB**: Stores data in a flexible, scalable NoSQL database
 - **SNS/SQS**: Handles asynchronous messaging and event-driven architecture
 - **S3**: Stores static assets and files (if needed)
+- **WebSockets**: Enables real-time streaming for artifacts
 
 ## Current Architecture
 
@@ -219,6 +220,122 @@ export const createArtifactHandler = createLambdaAdapter<ArtifactOutput, CreateA
 });
 ```
 
+## Streaming Artifacts Implementation
+
+To implement streaming artifacts with real-time updates:
+
+### 1. Add WebSocket Support
+
+Configure API Gateway WebSocket support:
+
+```typescript
+// infra/websocket.ts
+export const websocketApi = new sst.aws.WebSocketApi("WebSocketApi", {
+  routes: {
+    $connect: "./packages/functions/src/websocket.api.connectHandler",
+    $disconnect: "./packages/functions/src/websocket.api.disconnectHandler",
+    $default: "./packages/functions/src/websocket.api.defaultHandler",
+  },
+});
+
+export const websocketStage = new sst.aws.WebSocketStage("dev", {
+  webSocketApi: websocketApi.id,
+  stageName: "dev",
+  autoDeploy: true,
+});
+```
+
+### 2. Add Connection Management
+
+Create a DynamoDB table to track WebSocket connections:
+
+```typescript
+// infra/database.ts
+export const connectionsTable = new sst.aws.Dynamo("Connections", {
+  fields: {
+    connectionId: "string",
+    userId: "string",
+  },
+  primaryIndex: { hashKey: "connectionId" },
+  globalIndexes: {
+    userConnections: {
+      hashKey: "userId",
+      projection: "all",
+    },
+  },
+});
+```
+
+### 3. Implement Streaming Handler
+
+Create a Lambda function to stream artifact updates:
+
+```typescript
+// packages/functions/src/artifacts.api.streamArtifactHandler.ts
+import { ApiGatewayManagementApi } from "aws-sdk";
+import { DataStreamDelta } from "@metadata/agents/artifact.schema";
+
+export const streamArtifactHandler = async (event) => {
+  const { connectionId, payload } = JSON.parse(event.body);
+  const delta: DataStreamDelta = payload;
+  
+  const apigwManagementApi = new ApiGatewayManagementApi({
+    apiVersion: '2018-11-29',
+    endpoint: process.env.WEBSOCKET_ENDPOINT
+  });
+  
+  await apigwManagementApi.postToConnection({
+    ConnectionId: connectionId,
+    Data: JSON.stringify(delta)
+  }).promise();
+  
+  return { statusCode: 200, body: 'Message sent' };
+};
+```
+
+### 4. Third-Party AI Components
+
+For streaming artifacts, you'll need these third-party components:
+
+1. **Vercel AI SDK**: For streaming AI responses
+   ```bash
+   bun add @ai-sdk/react
+   ```
+
+   The Vercel AI SDK provides React hooks for streaming AI responses and managing chat state. It's used in the frontend to handle real-time updates to artifacts.
+
+2. **AWS SDK for JavaScript**: For WebSocket management
+   ```bash
+   bun add aws-sdk
+   ```
+
+3. **OpenAI Node.js SDK**: For generating content
+   ```bash
+   bun add openai
+   ```
+   
+   Configure the OpenAI client with streaming support:
+   
+   ```typescript
+   // packages/core/src/lib/openai.client.ts
+   import OpenAI from "openai";
+   
+   export const openai = new OpenAI({
+     apiKey: process.env.OPENAI_API_KEY,
+   });
+   
+   export async function streamCompletion(prompt: string, options = {}) {
+     const stream = await openai.chat.completions.create({
+       model: "gpt-4o",
+       messages: [{ role: "user", content: prompt }],
+       stream: true,
+       ...options,
+     });
+     
+     return stream;
+   }
+   ```
+
 ## Deployment
 
 To deploy your changes:
@@ -245,6 +362,10 @@ To test your AWS infrastructure:
 1. Use the AWS Console to verify created resources
 2. Use CloudWatch Logs to debug Lambda function execution
 3. Create unit tests for your Lambda functions
+4. Test WebSocket connections using wscat:
+   ```bash
+   wscat -c wss://your-api-id.execute-api.region.amazonaws.com/dev
+   ```
 
 ## Monitoring
 
@@ -253,3 +374,4 @@ Set up monitoring for your serverless infrastructure:
 1. Use CloudWatch metrics to monitor API Gateway, Lambda, and DynamoDB
 2. Set up alarms for error rates, duration, and throttling
 3. Use X-Ray for tracing requests through services
+4. Monitor WebSocket connection counts and message throughput
