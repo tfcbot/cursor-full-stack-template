@@ -1,7 +1,7 @@
 'use client';
 
 import { useGetResearchById } from '@/src/hooks/useResearchHooks';
-
+import { ArtifactDisplay } from './artifacts/ArtifactDisplay';
 import Link from 'next/link';
 
 export function ResearchDetail({ researchId }: { researchId: string }) {
@@ -43,16 +43,14 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
       </div>
       
       <div className="text-fg-tertiary text-sm">
-        Generated on {new Date(research.createdAt).toLocaleDateString()} at {new Date(research.createdAt).toLocaleTimeString()}
+        Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
       </div>
       
-      <div className="bg-bg-secondary p-6 rounded-lg shadow-card border border-border">
-        <div className="prose prose-invert prose-headings:text-fg-primary prose-p:text-fg-secondary prose-a:text-accent-secondary max-w-none">
-          {research.content.split('\n\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-        </div>
-      </div>
+      <ArtifactDisplay
+        researchId={research.researchId}
+        title={research.title}
+        content={research.content}
+      />
       
       <div className="flex space-x-4 mt-6">
         <button 
@@ -74,4 +72,4 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
       </div>
     </div>
   );
-} 
+}    
