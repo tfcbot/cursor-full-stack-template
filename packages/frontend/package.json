@@ -16,6 +16,7 @@
     "test:coverage": "bun test --coverage"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.29.1",
     "@tanstack/react-query": "^5.71.1",
     "dotenv": "^16.4.7",
     "glob": "^11.0.1",

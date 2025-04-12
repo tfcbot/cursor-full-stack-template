@@ -19,6 +19,7 @@ export const getAbsoluteUrl = async (path: string): Promise<string> => {
 };
 
 export const getHeaders = async (): Promise<HeadersInit> => {
+  
   return {
     ...API_CONFIG.defaultHeaders,
   };

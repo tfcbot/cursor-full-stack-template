@@ -41,5 +41,10 @@ api.route("POST /research", {
   handler: "./packages/functions/src/agent-runtime.api.requestResearchHandler",
 })
 
+api.route("POST /clerk-webhook", {
+  link: [...apiResources],
+  handler: "./packages/functions/src/clerk-webhook.handler",
+})
+
 
 
