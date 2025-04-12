@@ -12,14 +12,15 @@ export const usersTable = new sst.aws.Dynamo("Users", {
     primaryIndex: {hashKey: "userId"},
 })
 
-export const apiKeysTable = new sst.aws.Dynamo("ApiKeys", {
+export const userKeysTable = new sst.aws.Dynamo("UserKeys", {
     fields: {
         keyId: "string",
         userId: "string",
-        apiKey: "string"
+        status: "string"
     },
-    primaryIndex: {hashKey: "keyId"},
+    primaryIndex: {hashKey: "userId"},
     globalIndexes: {
-        ApiKeyIndex: { hashKey: "apiKey" }
+        KeyIdIndex: { hashKey: "keyId" }, 
+        StatusIndex: { hashKey: "status" }
     }
 })

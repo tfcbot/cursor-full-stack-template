@@ -9,6 +9,18 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "ClerkClientPublishableKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "ClerkClientSecretKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "ClerkWebhookSecret": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "MyWeb": {
       "type": "sst.aws.Nextjs"
       "url": string
@@ -25,9 +37,37 @@ declare module "sst" {
       "type": "sst.aws.Queue"
       "url": string
     }
+    "StripePublishableKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "StripeSecretKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "StripeWebhookSecret": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "TaskTopic": {
       "arn": string
       "type": "sst.aws.SnsTopic"
+    }
+    "UnkeyApiId": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "UnkeyRootKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "UserKeys": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "Users": {
+      "name": string
+      "type": "sst.aws.Dynamo"
     }
   }
 }

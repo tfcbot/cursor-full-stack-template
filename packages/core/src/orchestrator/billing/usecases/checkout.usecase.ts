@@ -1,5 +1,5 @@
 import { CheckoutSessionInput } from '@metadata/credits.schema';
-import { createSession } from '../adapters/secondary/billing-management.adapter';
+import { createSession } from '../adapters/secondary/stripe.adapter';
 
 export async function createCheckoutSessionUseCase(input: CheckoutSessionInput) {
   try {
