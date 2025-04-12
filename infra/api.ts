@@ -3,8 +3,11 @@ import {
 } from "./database";
 
 import { 
-  secrets, stripeSecretKey, stripeWebhookSecret, unkeyApiId, unkeyRootKey
- } from "./secrets";
+  secrets, stripeSecretKey, stripeWebhookSecret, unkeyApiId, unkeyRootKey,
+  clerkClientSecretKey,
+  clerkClientPublishableKey,
+  clerkWebhookSecret
+} from "./secrets";
 import { 
   TaskTopic, researchQueue 
 } from "./orchestrator";
@@ -84,7 +87,12 @@ api.route("GET /credits", {
 
 api.route("POST /clerk-webhook", {
   link: [...apiResources],
-  handler: "./packages/functions/src/clerk-webhook.handler",
+  handler: "./packages/functions/src/auth.api.webhookHandler",
+  environment: {
+    CLERK_SECRET_KEY: clerkClientSecretKey.value,
+    CLERK_PUBLISHABLE_KEY: clerkClientPublishableKey.value,
+    CLERK_WEBHOOK_SECRET: clerkWebhookSecret.value
+  }
 })
 
 

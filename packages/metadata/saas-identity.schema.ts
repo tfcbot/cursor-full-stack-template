@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { JwtPayload } from '@clerk/types';
+import { WebhookEvent } from '@clerk/backend';
 
 export const ValidUserSchema = z.object({
   userId: z.string(),
@@ -18,4 +19,5 @@ export interface ISaasIdentityVendingMachine {
   decodeJwt(token: string): Promise<JwtPayload>
   getValidUserFromAuthHeader(event: APIGatewayProxyEventV2): Promise<ValidUser | null>
   getValidUser(event: APIGatewayProxyEventV2): Promise<ValidUser>
+  validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent>
 }

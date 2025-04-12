@@ -1,0 +1,55 @@
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
+import { saasIdentityVendingMachine } from '@utils/tools/saas-identity';
+import { processWebhookUseCase } from '../../usecases/process-webhook.usecase';
+import { MessageSchema } from '@metadata/saas-identity.schema';
+
+export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+  try {
+    if (!event.body) {
+      throw new Error('Missing request body');
+    }
+    
+    let webhookEvent;
+    
+    try {
+      webhookEvent = await saasIdentityVendingMachine.validateWebhookEvent(event);
+    } catch (err) {
+      console.error('Webhook validation failed:', err);
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: 'Invalid webhook payload' 
+        })
+      };
+    }
+    
+    // Process the webhook event
+    const result = await processWebhookUseCase(webhookEvent);
+    
+    // Parse using the MessageSchema and return success
+    const response = MessageSchema.parse({ 
+      message: 'Webhook processed successfully' 
+    });
+    
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...response,
+        result
+      })
+    };
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    };
+  }
+}; 

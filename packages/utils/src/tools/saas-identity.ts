@@ -4,6 +4,7 @@ import { ClerkService, IJwtService } from '../vendors/jwt-vendor';
 import { DecodedJwtSchema } from '../../../metadata/jwt.schema';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { JwtPayload } from '@clerk/types';
+import { WebhookEvent } from '@clerk/backend';
 
 class SaaSIdentityErrors extends Error {
     constructor(message: string, public originalError: unknown) {
@@ -24,6 +25,10 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
     async decodeJwt(token: string): Promise<JwtPayload> {
         const decodedToken = await this.jwtService.decodeToken(token);
         return decodedToken;
+    }
+
+    async validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent> {
+        return await this.jwtService.validateWebhookEvent(event);
     }
 
     async getValidUserFromAuthHeader(event: APIGatewayProxyEventV2): Promise<ValidUser | null> {
