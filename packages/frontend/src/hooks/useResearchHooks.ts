@@ -3,14 +3,18 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
+import { useAuth } from './useAuth';
 
 /**
  * Hook for generating research
  */
 export function useRequestResearch() {
+  const { getAuthToken } = useAuth();
+
   return useMutation({
     mutationFn: async (request: RequestResearchInput) => {
-      return await postResearch(request);
+      const token = await getAuthToken();
+      return await postResearch(request, token || undefined);
     },
   });
 }
@@ -19,10 +23,13 @@ export function useRequestResearch() {
  * Hook for fetching all research
  */
 export function useGetAllResearch() {
+  const { getAuthToken } = useAuth();
+
   return useQuery({
     queryKey: ['allResearch'],
     queryFn: async () => {
-      const response = await getAllResearch();
+      const token = await getAuthToken();
+      const response = await getAllResearch(token || undefined);
       // Ensure we're working with an array, even if the API returns unexpected data
       if (Array.isArray(response)) {
         return response;
@@ -42,6 +49,8 @@ export function useGetAllResearch() {
  * Hook for fetching a specific research by ID
  */
 export function useGetResearchById(researchId?: string) {
+  const { getAuthToken } = useAuth();
+
   return useQuery({
     queryKey: ['research', researchId],
     queryFn: async () => {
@@ -49,7 +58,8 @@ export function useGetResearchById(researchId?: string) {
         return null;
       }
 
-      const response = await getResearchById(researchId);
+      const token = await getAuthToken();
+      const response = await getResearchById(researchId, token || undefined);
       // Handle both direct response and response.data patterns
       if (response && typeof response === 'object') {
         // If the API returns the data directly

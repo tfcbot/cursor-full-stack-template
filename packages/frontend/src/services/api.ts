@@ -18,18 +18,24 @@ export const getAbsoluteUrl = async (path: string): Promise<string> => {
   return `${API_CONFIG.baseUrl}${path}`;
 };
 
-export const getHeaders = async (): Promise<HeadersInit> => {
-  
-  return {
+export const getHeaders = async (token?: string): Promise<HeadersInit> => {
+  const headers: Record<string, string> = {
     ...API_CONFIG.defaultHeaders,
   };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
 };
 
-export const getAllResearch = async (): Promise<RequestResearchOutput[]> => {
+export const getAllResearch = async (token?: string): Promise<RequestResearchOutput[]> => {
   const absoluteUrl = await getAbsoluteUrl('/research');
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
+      headers: await getHeaders(token),
     });
     
     if (!response.ok) {
@@ -58,11 +64,12 @@ export const getAllResearch = async (): Promise<RequestResearchOutput[]> => {
   }
 }
 
-export const getResearchById = async (researchId: string): Promise<RequestResearchOutput | null> => {
+export const getResearchById = async (researchId: string, token?: string): Promise<RequestResearchOutput | null> => {
   const absoluteUrl = await getAbsoluteUrl(`/research/${researchId}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
+      headers: await getHeaders(token),
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch deep research: ${response.status} ${response.statusText}`);
@@ -74,12 +81,12 @@ export const getResearchById = async (researchId: string): Promise<RequestResear
   }
 }
 
-export const postResearch = async (requestData: RequestResearchInput): Promise<RequestResearchOutput> => {
+export const postResearch = async (requestData: RequestResearchInput, token?: string): Promise<RequestResearchOutput> => {
   const absoluteUrl = await getAbsoluteUrl('/research');
   try {
     const response = await fetch(absoluteUrl, {
       method: 'POST',
-      headers: await getHeaders(),
+      headers: await getHeaders(token),
       body: JSON.stringify(requestData),
     });
 
