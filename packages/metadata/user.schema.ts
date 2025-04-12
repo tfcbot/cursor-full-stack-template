@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { GetRemainingCreditsInput, GetRemainingCreditsOutput } from "./credits.schema";
-import { GetUserCreditsInput, GetUserCreditsOutput } from "./credits.schema";
 
 // Enums
 export enum PaymentStatus {
@@ -17,23 +15,10 @@ export enum OnboardingStatus {
 // Schemas
 export const UserDetailsSchema = z.object({
     id: z.string(),
-    email_addresses: z.array(
-        z.object({
-            email_address: z.string().email()
-        })
-    ).optional(),
-    first_name: z.string().optional(),
-    last_name: z.string().optional()
 });
 
 export const NewUserSchema = z.object({
     userId: z.string(),
-    onboardingStatus: z.nativeEnum(OnboardingStatus).default(OnboardingStatus.NOT_STARTED),
-    paymentStatus: z.nativeEnum(PaymentStatus).default(PaymentStatus.NOT_PAID),
-    email: z.string().email().optional(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    credits: z.number().default(0)
 });
 
 export const UserSchema = z.object({

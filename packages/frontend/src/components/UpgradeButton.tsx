@@ -3,7 +3,7 @@
 import { useCheckout } from '../hooks/useCheckout';
 
 export function UpgradeButton() {
-  const { startCheckout, isLoading, error } = useCheckout();
+  const { startCheckout, isLoading } = useCheckout();
   
   return (
     <button

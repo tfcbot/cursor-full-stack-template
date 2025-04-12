@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import { initiateCheckout } from '../services/creditService';
-import { useRouter } from 'next/navigation';
 
 export function useCheckout() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const startCheckout = async () => {
     setIsLoading(true);

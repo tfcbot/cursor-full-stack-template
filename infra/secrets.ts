@@ -7,13 +7,13 @@ export const unkeyApiId = new sst.Secret('UnkeyApiId')
 export const unkeyRootKey = new sst.Secret('UnkeyRootKey')
 export const clerkClientPublishableKey = new sst.Secret("ClerkClientPublishableKey")
 export const clerkClientSecretKey = new sst.Secret("ClerkClientSecretKey")
-export const clerkWebhookSecret = new sst.Secret("ClerkWebhookSecret")
+export const clerkClientWebhookSecret = new sst.Secret("ClerkClientWebhookSecret")
 
 export const secrets = [
     openaiApiKey,
     clerkClientPublishableKey,
     clerkClientSecretKey,
-    clerkWebhookSecret,
+    clerkClientWebhookSecret,
     stripeSecretKey,
     stripeWebhookSecret,
     stripePublishableKey,

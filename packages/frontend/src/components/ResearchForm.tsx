@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequestResearch } from '../hooks/useResearchHooks';
 import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
-import { v4 as uuidv4 } from 'uuid';
 
 export function ResearchForm() {
   const router = useRouter();
@@ -23,7 +22,7 @@ export function ResearchForm() {
     e.preventDefault();
     
     mutate(formData, {
-      onSuccess: (data) => {
+      onSuccess: () => {
         router.push(`/research/`);
       }
     });

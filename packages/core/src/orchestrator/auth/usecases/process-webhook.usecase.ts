@@ -29,22 +29,9 @@ async function handleUserCreated(userData: any) {
   try {
     // Parse and validate user data from Clerk
     const parsedUserData = UserDetailsSchema.parse(userData);
-    
-    // Extract email if available
-    let email: string | undefined;
-    if (parsedUserData.email_addresses && parsedUserData.email_addresses.length > 0) {
-      email = parsedUserData.email_addresses[0].email_address;
-    }
-    
     // Create new user object
     const newUser: NewUser = {
       userId: parsedUserData.id,
-      onboardingStatus: OnboardingStatus.NOT_STARTED,
-      paymentStatus: PaymentStatus.NOT_PAID,
-      firstName: parsedUserData.first_name,
-      lastName: parsedUserData.last_name,
-      email: email,
-      credits: 5 // Give new users some free credits
     };
     
     // Register the user in the database
