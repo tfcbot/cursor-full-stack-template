@@ -16,7 +16,7 @@ import { GetResearchInput, GetResearchInputSchema } from '@metadata/agents/resea
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
 import { getResearchUsecase } from '@agent-runtime/researcher/usecase/get-research.usecase';
-import { getAllResearchUsecase } from '../../../researcher/usecase/get-all-research.usecase';
+import { getAllResearchUsecase } from '../../usecase/get-all-research.usecase';
 import { z } from 'zod';
 
 // Create a custom schema that can handle both null (for all research) and GetResearchInput (for specific ID)

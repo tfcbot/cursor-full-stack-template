@@ -8,16 +8,11 @@ import { SaaSIdentityVendingMachine } from '@utils/tools/saas-identity';
 
 export const checkoutAdapter = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
-    if (!event.body) {
-      throw new Error('Missing request body');
-    }
-
-    const body = JSON.parse(event.body);
+;
     const svm = new SaaSIdentityVendingMachine();
     const validUser = await svm.getValidUser(event);
     
     const params: CheckoutSessionInput = CheckoutSessionInputSchema.parse({ 
-      ...body, 
       userId: validUser.userId 
     });
     
