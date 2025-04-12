@@ -43,7 +43,7 @@ export const webhookAdapter = async (event: APIGatewayProxyEventV2): Promise<API
     console.error('Error processing webhook:', error);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: error.message || 'Invalid request' })
+      body: JSON.stringify({ error: error instanceof Error ? error.message : 'Invalid request' })
     };
   }
 };

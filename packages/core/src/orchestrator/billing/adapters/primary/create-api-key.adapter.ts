@@ -27,8 +27,8 @@ export const createApiKeyAdapter = async (event: APIGatewayProxyEventV2): Promis
   } catch (error) {
     console.error('Error creating API key:', error);
     return {
-      statusCode: error.message === 'Unauthorized' ? 401 : 400,
-      body: JSON.stringify({ error: error.message || 'Invalid request' }),
+      statusCode: error instanceof Error ? (error.message === 'Unauthorized' ? 401 : 400) : 500,
+      body: JSON.stringify({ error: error instanceof Error ? error.message : 'Invalid request' }),
     };
   }
 };

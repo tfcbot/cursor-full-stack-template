@@ -30,8 +30,8 @@ export const checkoutAdapter = async (event: APIGatewayProxyEventV2): Promise<AP
   } catch (error) {
     console.error('Error processing checkout:', error);
     return {
-      statusCode: error.message === 'Unauthorized' ? 401 : 400,
-      body: JSON.stringify({ error: error.message || 'Invalid request' }),
+      statusCode: error instanceof Error ? (error.message === 'Unauthorized' ? 401 : 400) : 500,
+      body: JSON.stringify({ error: error instanceof Error ? error.message : 'Invalid request' }),
     };
   }
 };

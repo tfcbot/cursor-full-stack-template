@@ -98,19 +98,8 @@ export async function updateUserCredits(command: UpdateUserCreditsCommand) {
     const updateCommand = new UpdateCommand(updateParams);
     await dynamoClient.send(updateCommand);
     
-    const transactionParams = {
-      TableName: "Transactions",
-      Item: {
-        userId: command.userId,
-        timestamp: new Date().toISOString(),
-        amount: command.amount,
-        type: command.operation === 'increment' ? TransactionType.CREDIT : TransactionType.DEBIT,
-        keyId: command.keyId || null
-      }
-    };
-    
-    const transactionCommand = new PutCommand(transactionParams);
-    await dynamoClient.send(transactionCommand);
+    // Note: Transaction recording has been moved to the Unkey adapter
+    // and is now handled directly through the Unkey API
     
     return { credits: newCredits };
   } catch (error) {

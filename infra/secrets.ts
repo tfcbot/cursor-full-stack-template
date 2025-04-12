@@ -1,4 +1,3 @@
-import * as sst from "sst"
 
 export const openaiApiKey = new sst.Secret("OpenAiApiKey")
 export const stripeSecretKey = new sst.Secret('StripeSecretKey')

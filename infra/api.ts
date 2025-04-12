@@ -1,21 +1,20 @@
 import { 
-    researchTable, usersTable, transactionsTable, apiKeysTable
+    researchTable, usersTable, apiKeysTable
 } from "./database";
 
 import { 
-  secrets, stripeSecretKey, stripeWebhookSecret
+  secrets, stripeSecretKey, stripeWebhookSecret, unkeyApiId, unkeyRootKey
  } from "./secrets";
 import { 
   TaskTopic, researchQueue 
 } from "./orchestrator";
 
-import * as sst from "sst";
 
 export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
 const topics = [TaskTopic]
-const tables = [researchTable, usersTable, transactionsTable, apiKeysTable]
+const tables = [researchTable, usersTable, apiKeysTable]
 const queues = [researchQueue]
 
 export const apiResources = [
@@ -48,7 +47,9 @@ api.route("POST /checkout", {
   environment: {
     STRIPE_SECRET_KEY: stripeSecretKey.value,
     REDIRECT_SUCCESS_URL: "http://localhost:3000/dashboard",
-    REDIRECT_FAILURE_URL: "http://localhost:3000/dashboard"
+    REDIRECT_FAILURE_URL: "http://localhost:3000/dashboard",
+    UNKEY_API_ID: unkeyApiId.value,
+    UNKEY_ROOT_KEY: unkeyRootKey.value
   }
 })
 
@@ -57,18 +58,28 @@ api.route("POST /webhook", {
   handler: "./packages/functions/src/billing.api.webhookHandler",
   environment: {
     STRIPE_SECRET_KEY: stripeSecretKey.value,
-    STRIPE_WEBHOOK_SECRET: stripeWebhookSecret.value
+    STRIPE_WEBHOOK_SECRET: stripeWebhookSecret.value,
+    UNKEY_API_ID: unkeyApiId.value,
+    UNKEY_ROOT_KEY: unkeyRootKey.value
   }
 })
 
 api.route("POST /api-keys", {
   link: [...apiResources],
-  handler: "./packages/functions/src/billing.api.createApiKeyHandler"
+  handler: "./packages/functions/src/billing.api.createApiKeyHandler",
+  environment: {
+    UNKEY_API_ID: unkeyApiId.value,
+    UNKEY_ROOT_KEY: unkeyRootKey.value
+  }
 })
 
 api.route("GET /credits", {
   link: [...apiResources],
-  handler: "./packages/functions/src/billing.api.getUserCreditsHandler"
+  handler: "./packages/functions/src/billing.api.getUserCreditsHandler",
+  environment: {
+    UNKEY_API_ID: unkeyApiId.value,
+    UNKEY_ROOT_KEY: unkeyRootKey.value
+  }
 })
 
 
