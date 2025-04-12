@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Credits } from './Credits';
 import { UpgradeButton } from './UpgradeButton';
+import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 
 export function Navbar() {
   const pathname = usePathname();
+  const { isSignedIn } = useUser();
   
   return (
     <nav className="bg-bg-secondary border-b border-border py-4 px-6">
@@ -26,6 +28,20 @@ export function Navbar() {
           <NavLink href="/research" active={pathname === '/research'}>
             View Research
           </NavLink>
+          
+          {isSignedIn ? (
+            <SignOutButton>
+              <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                Sign Out
+              </button>
+            </SignOutButton>
+          ) : (
+            <SignInButton>
+              <button className="bg-accent-tertiary hover:bg-accent-secondary text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                Sign In
+              </button>
+            </SignInButton>
+          )}
         </div>
       </div>
     </nav>
