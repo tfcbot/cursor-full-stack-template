@@ -4,6 +4,8 @@ import { processWebhookUseCase } from '../../usecases/process-webhook.usecase';
 import { MessageSchema } from '@metadata/saas-identity.schema';
 
 export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+  console.info("Auth webhook adapter received event:", event.headers['svix-id']);
+  
   try {
     if (!event.body) {
       throw new Error('Missing request body');
@@ -12,7 +14,9 @@ export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise
     let webhookEvent;
     
     try {
+      // Validate the webhook event with Clerk
       webhookEvent = await saasIdentityVendingMachine.validateWebhookEvent(event);
+      console.info("Validated webhook event of type:", webhookEvent.type);
     } catch (err) {
       console.error('Webhook validation failed:', err);
       return {
@@ -24,7 +28,7 @@ export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise
       };
     }
     
-    // Process the webhook event
+    // Process the webhook event with our usecase
     const result = await processWebhookUseCase(webhookEvent);
     
     // Parse using the MessageSchema and return success

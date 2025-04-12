@@ -7,10 +7,11 @@ import { Resource } from "sst";
 import { Webhook } from 'svix';
 
 export interface IJwtService {
-  validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<any>
+  validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent>
   extractTokenFromHeader(event: APIGatewayProxyEventV2): Promise<string>
   decodeToken(token: string): Promise<JwtPayload>
   validateToken(token: string): Promise<JwtPayload>
+  updateUserProperties(command: UpdatePropertyCommandInput): Promise<string>
 }
 
 export class ClerkService implements IJwtService {
@@ -49,7 +50,7 @@ export class ClerkService implements IJwtService {
     }
   }
 
-  async validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<any> {
+  async validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent> {
     this.validateWebhookSecret();
     const { headers, payload } = this.extractEventData(event);
     this.validateSvixHeaders(headers);
@@ -83,7 +84,7 @@ export class ClerkService implements IJwtService {
     }
   }
   
-  private verifyWebhook(payload: string, headers: any): any {
+  private verifyWebhook(payload: string, headers: any): WebhookEvent {
     const wh = new Webhook(this.clerkWebhookSecret);
   
     try {
