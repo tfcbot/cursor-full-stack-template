@@ -55,4 +55,31 @@ export const getUserCredits = async (token?: string): Promise<number> => {
     console.error('Error fetching credits:', error);
     return 0;
   }
+}
+
+export const initiateCheckout = async (token?: string): Promise<{ url: string }> => {
+  const absoluteUrl = await getAbsoluteUrl('/checkout');
+  try {
+    const response = await fetch(absoluteUrl, {
+      method: 'POST',
+      headers: await getHeaders(token),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to initiate checkout: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (typeof data.url === 'string') {
+      return { url: data.url };
+    }
+    
+    // If we reach here, the response format was unexpected
+    console.error('Unexpected response format from initiateCheckout:', data);
+    throw new Error('Invalid checkout response format');
+  } catch (error) {
+    console.error('Error initiating checkout:', error);
+    throw error;
+  }
 } 
