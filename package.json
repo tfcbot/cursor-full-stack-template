@@ -14,6 +14,10 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22",
+    "@clerk/backend": "^1.13.9",
+    "@clerk/types": "^3.60.0",
+    "@svix/lib": "^1.16.0",
+    "jwks-rsa": "^3.1.0",
     "typescript": "^5"
   },
   "dependencies": {
