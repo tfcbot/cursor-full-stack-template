@@ -54,7 +54,7 @@ export const CheckoutSessionCompletedSchema = z.object({
 
 export const UpdateUserCreditsCommandSchema = z.object({
     userId: z.string(),
-    keyId: z.string().optional(),
+    keyId: z.string(),
     operation: z.enum(['increment', 'decrement']),
     amount: z.number()
 });
@@ -80,6 +80,7 @@ export const ValidateApiKeyInputSchema = z.object({
 
 export const GetUserCreditsInputSchema = z.object({
     userId: z.string(),
+    keyId: z.string()
 });
 
 export type User = z.infer<typeof UserSchema>;

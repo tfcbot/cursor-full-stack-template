@@ -1,5 +1,5 @@
 import { CheckoutSessionCompleted } from '@metadata/credits.schema';
-import { apiKeyAdapter } from '../adapters/secondary/api-key.adapter';
+import { apiKeyAdapter } from '@orchestrator/billing/adapters/secondary/api-key.adapter';
 
 export async function processWebhookUseCase(event: any) {
   console.log('Processing webhook event:', event.type);
@@ -31,6 +31,7 @@ async function handleCheckoutSessionCompleted(session: CheckoutSessionCompleted)
     
     const result = await apiKeyAdapter.updateUserCredits({
       userId,
+      keyId: session.id,
       operation: 'increment',
       amount
     });

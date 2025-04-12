@@ -1,10 +1,9 @@
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { ValidUser, ValidUserSchema, ISaasIdentityVendingMachine } from '../../../metadata/saas-identity.schema';
-import { ClerkService, IJwtService } from '../vendors/jwt-vendor';
-import { DecodedJwtSchema } from '../../../metadata/jwt.schema';
+import { ValidUser, ValidUserSchema, ISaasIdentityVendingMachine } from '@metadata/saas-identity.schema';
+import { ClerkService, IJwtService } from '@utils/vendors/jwt-vendor';
+import { DecodedJwtSchema } from '@metadata/jwt.schema';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { JwtPayload } from '@clerk/types';
-import { WebhookEvent } from '@clerk/backend';
 
 class SaaSIdentityErrors extends Error {
     constructor(message: string, public originalError: unknown) {
@@ -27,10 +26,6 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
         return decodedToken;
     }
 
-    async validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent> {
-        return await this.jwtService.validateWebhookEvent(event);
-    }
-
     async getValidUserFromAuthHeader(event: APIGatewayProxyEventV2): Promise<ValidUser | null> {
         try {
             const token = event.headers['authorization']?.split(' ')[1] || '';
@@ -40,37 +35,42 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
             const userDetails: ValidUser = {
                 userId: parsedJwt.sub,
             };
-            
-            // Add keyId if it exists in metadata
-            if (parsedJwt.metadata?.keyId) {
-                userDetails.keyId = parsedJwt.metadata.keyId;
-            }
-            
             const isValidUserDetailsAuthHeader = ValidUserSchema.safeParse(userDetails);
             if (isValidUserDetailsAuthHeader.success) {
                 return isValidUserDetailsAuthHeader.data;
             }
             return null;
         } catch (error) {
-            console.error('User not found in auth header');
+            console.info('User not found in auth header');
             return null;
         }
     }
 
     async getValidUser(event: APIGatewayProxyEventV2): Promise<ValidUser> {
         try {
-            const userDetailsFromAuthHeader = await this.getValidUserFromAuthHeader(event);  
+            const userDetailsFromAuthHeader = await this.getValidUserFromAuthHeader(event);          
             if (userDetailsFromAuthHeader) {
+                console.info('User found in auth header', userDetailsFromAuthHeader);
                 return userDetailsFromAuthHeader;
             }
-            throw new Error('Unable to validate user. Provide a valid API key or access token');
+            throw new Error('Unable to Validate User. Provide a valid api key or access token');
+        
         } catch (error) {
             console.error('Error getting user details:', error);
             throw new Error('Unauthorized');
         }
     }
+    
+    async validateWebhook(event: APIGatewayProxyEventV2): Promise<any> {
+        try {
+            if (!this.jwtService) {
+                throw new Error('JWT service not initialized');
+            }
+            return await this.jwtService.validateWebhookEvent(event);
+        } catch (error) {
+            console.error('Error validating webhook:', error);
+            throw new Error('Invalid webhook payload');
+        }
+    }
 }
-
-// Export an instance for easy use
-export const saasIdentityVendingMachine = new SaaSIdentityVendingMachine();
 

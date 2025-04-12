@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { processWebhookUseCase } from '../../usecases/process-webhook.usecase';
-
+import { Resource } from 'sst';
 const Stripe = require('stripe');
 
 export const webhookAdapter = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
@@ -14,8 +14,9 @@ export const webhookAdapter = async (event: APIGatewayProxyEventV2): Promise<API
       throw new Error('Missing stripe signature header');
     }
     
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    const webhookSecret = Resource.StripeWebhookSecret.value;
+    const stripeSecretKey = Resource.StripeSecretKey.value;
+    const stripe = Stripe(stripeSecretKey);
     
     let stripeEvent;
     

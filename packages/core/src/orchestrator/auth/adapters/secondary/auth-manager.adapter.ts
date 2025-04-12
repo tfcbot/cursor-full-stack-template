@@ -1,5 +1,5 @@
-import { ClerkService } from "../../../../../utils/src/vendors/jwt-vendor";
-import { UpdatePropertyCommandInput } from "../../../../../metadata/jwt.schema";
+import { ClerkService } from "@utils/vendors/jwt-vendor";
+import { UpdatePropertyCommandInput } from "@metadata/jwt.schema";
 
 export interface IAuthManagerAdapter {
   updateUserProperties(command: UpdatePropertyCommandInput): Promise<string>;

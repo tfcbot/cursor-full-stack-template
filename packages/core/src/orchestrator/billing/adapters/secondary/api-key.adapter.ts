@@ -23,8 +23,8 @@ export class ApiKeyAdapter implements IApiKeyAdapter {
   public apiId: string;
 
   constructor() {
-    const rootKey = process.env.UNKEY_ROOT_KEY;
-    const apiId = process.env.UNKEY_API_ID;
+    const rootKey = Resource.UnkeyRootKey.value;
+    const apiId = Resource.UnkeyApiId.value;
     
     if (!rootKey) {
       throw new Error('UNKEY_ROOT_KEY environment variable is not set');
@@ -47,13 +47,13 @@ export class ApiKeyAdapter implements IApiKeyAdapter {
     try {
       if (!command.keyId) {
         // Get the user's active API key
-        const { result: userResponse } = await this.unkey.apis.getKeys({
+        const { result: userResponse } = await this.unkey.apis.listKeys({
           apiId: this.apiId,
           ownerId: command.userId,
           limit: 1
         });
         
-        if (!userResponse.keys || userResponse.keys.length === 0) {
+        if (!userResponse?.keys || userResponse.keys.length === 0) {
           throw new Error('User has no API keys');
         }
         
