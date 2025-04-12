@@ -13,6 +13,7 @@ export default $config({
     const infra = await import("./infra");
     return {
       url: infra.frontend.url,
+      api: infra.api.url,
     };
   },
 });
