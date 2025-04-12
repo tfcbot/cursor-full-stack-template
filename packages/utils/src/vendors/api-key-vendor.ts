@@ -30,7 +30,7 @@ export class ApiKeyRepository {
   async getUserDetailsByApiKey(apiKey: string): Promise<ValidUser> {
     try {
       const params = {
-        TableName: Resource.UserKeysTable.tableName,
+        TableName: Resource.UserKeys.name,
         IndexName: "ApiKeyIndex",
         KeyConditionExpression: "apiKey = :apiKey",
         ExpressionAttributeValues: {
@@ -58,11 +58,10 @@ export class ApiKeyRepository {
   async saveApiKey(command: SaveApiKeyCommand): Promise<void> {
     try {
       const params = {
-        TableName: Resource.UserKeysTable.tableName,
+        TableName: Resource.UserKeys.name,
         Item: {
           keyId: command.keyId,
           userId: command.userId,
-          apiKey: command.apiKey,
           name: command.name || `API Key for ${command.userId}`,
           expires: command.expires,
           createdTimestamp: new Date().toISOString()
@@ -106,24 +105,24 @@ export class ApiKeyService {
       meta: {
         userId: params.userId,
       },
-      expires: params.expires,
+      expires: params.expires ? Math.floor(params.expires.getTime() / 1000) : undefined,
     });
 
-    if (!result.success) {
+    if (!result.result) {
       throw new Error("Failed to create API key: " + result.error);
     }
 
     await this.apiKeyRepository.saveApiKey({
-      keyId: result.key.id,
+      keyId: result.result.keyId,
       userId: params.userId,
-      apiKey: result.key.key,
+      apiKey: result.result.key,
       name: params.name,
       expires: params.expires?.toISOString(),
     });
 
     return {
-      key: result.key.key,
-      keyId: result.key.id,
+      key: result.result.key,
+      keyId: result.result.keyId,
     };
   }
 
@@ -131,12 +130,12 @@ export class ApiKeyService {
     try {
       const result = await this.unkey.keys.verify({ key });
 
-      if (!result.success || !result.valid) {
+      if (!result.result || !result.result.valid) {
         throw new Error('Invalid API key');
       }
 
-      const userId = result.meta?.userId as string;
-      const keyId = result.keyId;
+      const userId = result.result.meta?.userId as string;
+      const keyId = result.result.keyId;
 
       if (!userId) {
         throw new Error('Invalid API key');

@@ -28,7 +28,7 @@ export const getHeaders = async (token?: string): Promise<HeadersInit> => {
 };
 
 export const getUserCredits = async (token?: string): Promise<number> => {
-  const absoluteUrl = await getAbsoluteUrl('/user/credits');
+  const absoluteUrl = await getAbsoluteUrl('/credits');
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
