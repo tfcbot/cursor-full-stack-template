@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { initiateCheckout } from '../services/creditService';
 import { useAuth } from './useAuth';
+import { loadStripe } from '@stripe/stripe-js';
 
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
 export function useCheckout() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,14 +20,24 @@ export function useCheckout() {
       if (!token) {
         throw new Error('No token found');
       }
-      const { url } = await initiateCheckout(token);
+      const id = await initiateCheckout(token);
+
+
+      if (!stripeKey) {
+        
+        throw new Error('No Stripe key available');
+      }
+      const stripe = await loadStripe(stripeKey);
+
+      if (!stripe) {
+        throw new Error('Failed to load Stripe');
+      }
+      // Redirect to Checkout
+      const { error } = await stripe.redirectToCheckout({ sessionId: id });
+
       
       // Redirect to the checkout URL
-      if (url) {
-        window.location.href = url;
-      } else {
-        setError('Invalid checkout URL received');
-      }
+      console.log("I HAVE THE ID", id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initiate checkout');
     } finally {

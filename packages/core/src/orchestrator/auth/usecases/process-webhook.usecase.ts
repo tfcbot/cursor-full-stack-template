@@ -11,8 +11,6 @@ export async function processWebhookUseCase(event: WebhookEvent) {
         return await handleUserCreated(event.data);
       case 'user.updated':
         return await handleUserUpdated(event.data);
-      case 'user.deleted':
-        return await handleUserDeleted(event.data);
       default:
         console.log(`Unhandled event type: ${event.type}`);
         return { status: 'ignored', event: event.type };

@@ -1,16 +1,17 @@
+
 import { 
-    researchTable, usersTable, userKeysTable
+  researchTable, usersTable, userKeysTable
 } from "./database";
 
 import { 
-  secrets
-} from "./secrets";
-import { 
-  TaskTopic, researchQueue 
+TaskTopic, researchQueue 
 } from "./orchestrator";
+
+import { clerkClientPublishableKey, clerkClientSecretKey, secrets, stripePublishableKey } from "./secrets";
 
 
 export const api = new sst.aws.ApiGatewayV2('BackendApi')
+
 
 
 const topics = [TaskTopic]
@@ -41,13 +42,8 @@ api.route("POST /research", {
   handler: "./packages/functions/src/agent-runtime.api.requestResearchHandler",
 })
 
-api.route("POST /checkout", {
-  link: [...apiResources],
-  handler: "./packages/functions/src/billing.api.checkoutHandler",
- 
-})
 
-api.route("POST /webhook", {
+api.route("POST /stripe-webhook", {
   link: [...apiResources],
   handler: "./packages/functions/src/billing.api.webhookHandler",
  
@@ -75,3 +71,21 @@ api.route("POST /register", {
 ],
 })
 
+
+
+export const frontend = new sst.aws.Nextjs("MyWeb", {
+  link: [api, secrets],
+  path: "packages/frontend",
+  environment: {
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: clerkClientPublishableKey.value,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: stripePublishableKey.value,
+    CLERK_SECRET_KEY: clerkClientSecretKey.value,
+    NEXT_PUBLIC_BACKEND_API_URL: api.url,
+  },
+});
+
+api.route("POST /checkout", {
+  link: [...apiResources, frontend],
+  handler: "./packages/functions/src/billing.api.checkoutHandler",
+
+})

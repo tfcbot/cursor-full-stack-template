@@ -1,9 +1,7 @@
-'use server';
 
-import { Resource } from "sst";
 import { parseApiResponse, UserCreditsResponseSchema } from "@metadata/api-response.schema";
 
-const API_URL = Resource.BackendApi.url;
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 const API_CONFIG = {
   baseUrl: API_URL,
@@ -14,6 +12,8 @@ const API_CONFIG = {
 };
 
 export const getAbsoluteUrl = async (path: string): Promise<string> => {
+  console.log("GETTING ABSOLUTE URL")
+  console.log('API_CONFIG.baseUrl', API_CONFIG.baseUrl);
   return `${API_CONFIG.baseUrl}${path}`;
 };
 
@@ -52,8 +52,11 @@ export const getUserCredits = async (token: string): Promise<number> => {
   }
 }
 
-export const initiateCheckout = async (token: string): Promise<{ url: string }> => {
+export async function initiateCheckout(token: string): Promise<string> {
+  
   const absoluteUrl = await getAbsoluteUrl('/checkout');
+  console.log('CALLING CHECKOUT API', API_URL);
+  console.log('absoluteUrl', absoluteUrl);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'POST',
@@ -64,20 +67,9 @@ export const initiateCheckout = async (token: string): Promise<{ url: string }> 
       throw new Error(`Failed to initiate checkout: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
-    
-    // Parse with the schema if you've defined a CheckoutResponseSchema
-    // const parsedData = parseApiResponse(data, CheckoutResponseSchema);
-    // return parsedData;
-    
-    // For now, keep the existing logic
-    if (typeof data.url === 'string') {
-      return { url: data.url };
-    }
-    
-    // If we reach here, the response format was unexpected
-    console.error('Unexpected response format from initiateCheckout:', data);
-    throw new Error('Invalid checkout response format');
+    const data = await response.json() as { id: string };
+    console.log('CHECKOUT SESSION ID:', data.id);
+    return data.id;
   } catch (error) {
     console.error('Error initiating checkout:', error);
     throw error;

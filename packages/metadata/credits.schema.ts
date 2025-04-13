@@ -41,15 +41,19 @@ export const TransactionDtoSchema = z.object({
 
 export const CheckoutSessionInputSchema = z.object({
   userId: z.string(),
+  keyId: z.string(),
   quantity: z.number().default(1),
 });
 
+export const MetadataRefillSchema = z.object({
+    userId: z.string(),
+    keyId: z.string(),
+    amount: z.string(),
+  });
+
 export const CheckoutSessionCompletedSchema = z.object({
   id: z.string(),
-  metadata: z.object({
-    userId: z.string(),
-    amount: z.number().optional(),
-  }),
+  metadata: MetadataRefillSchema,
 });
 
 export const UpdateUserCreditsCommandSchema = z.object({
@@ -83,6 +87,8 @@ export const GetUserCreditsInputSchema = z.object({
     keyId: z.string()
 });
 
+
+
 export type User = z.infer<typeof UserSchema>;
 export type CheckoutInfo = z.infer<typeof CheckoutInfoSchema>;
 export type TransactionDto = z.infer<typeof TransactionDtoSchema>;
@@ -93,3 +99,4 @@ export type ApiKey = z.infer<typeof ApiKeySchema>;
 export type CreateApiKeyInput = z.infer<typeof CreateApiKeyInputSchema>;
 export type ValidateApiKeyInput = z.infer<typeof ValidateApiKeyInputSchema>;
 export type GetUserCreditsInput = z.infer<typeof GetUserCreditsInputSchema>;
+export type MetadataRefill = z.infer<typeof MetadataRefillSchema>;

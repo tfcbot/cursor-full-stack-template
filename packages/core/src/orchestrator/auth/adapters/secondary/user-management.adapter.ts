@@ -126,7 +126,6 @@ export class UserAdapter implements IUserAdapter {
       const result = await apiKeyService.createApiKey({
         userId,
         name: `API Key for ${userId}`,
-        
       });
       
       console.info("API key generated successfully for user:", userId);
