@@ -12,14 +12,14 @@ import {
     LambdaAdapterOptions,
     GetUserInfo
   } from '@lib/lambda-adapter.factory';
-import { RequestResearchInputSchema, RequestResearchInput } from "@metadata/agents/research-agent.schema";
+import { RequestResearchInputSchema, RequestResearchInput, ResearchStatus, RequestResearchOutputSchema } from "@metadata/agents/research-agent.schema";
 import { OrchestratorHttpResponses } from '@metadata/http-responses.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
 import { Topic } from '@metadata/orchestrator.schema';
 import { Queue } from '@metadata/orchestrator.schema';
 import { topicPublisher } from '@lib/topic-publisher.adapter';
-
+import { researchRepository } from '@agent-runtime/researcher/adapters/secondary/datastore.adapter';
 
 /**
  * Parser function that transforms the API Gateway event into the format
@@ -40,8 +40,7 @@ const researchEventParser: EventParser<RequestResearchInput> = (
   const parsedBodyWithIds = RequestResearchInputSchema.parse({
     ...parsedBody,
     ...validUser,
-    orderId: randomUUID(),
-    deliverableId: randomUUID()
+
   });
 
   
@@ -58,6 +57,21 @@ const researchAdapterOptions: LambdaAdapterOptions = {
   requiredFields: ['prompt']
 };
 
+/**
+ * Creates an initial pending research entry in the database
+ */
+const createPendingResearch = async (input: RequestResearchInput) => {
+  const initialResearch = RequestResearchOutputSchema.parse({
+    researchId: input.id,
+    userId: input.userId,
+    title: `Research for: ${input.prompt.substring(0, 50)}...`,
+    content: '',
+    citation_links: [],
+    status: ResearchStatus.PENDING,
+  });
+
+  await researchRepository.saveResearch(initialResearch);
+};
 
 /**
  * Use case for publishing a research generation request.
@@ -65,6 +79,10 @@ const researchAdapterOptions: LambdaAdapterOptions = {
  * which includes the user information from getUserInfo.
  */
 const publishMessageUsecase = async (input: RequestResearchInput) => {
+  // Create a pending research entry
+  const pendingResearch = await createPendingResearch(input);
+  
+  // Publish the message to the queue
   topicPublisher.publishAgentMessage({
     topic: Topic.task,
     id: randomUUID(),

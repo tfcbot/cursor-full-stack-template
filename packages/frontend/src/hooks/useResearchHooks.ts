@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
+import { RequestResearchInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
 import { useAuth } from './useAuth';
 
@@ -29,16 +29,20 @@ export function useGetAllResearch() {
     queryKey: ['allResearch'],
     queryFn: async () => {
       const token = await getAuthToken();
-      const response = await getAllResearch(token || undefined);
+      if (!token) {
+        return null;
+      }
+      const response = await getAllResearch(token);
       return response;
     },
+    refetchInterval: 30000, // Refetch every 30 seconds to check for status updates
   });
 }
 
 /**
  * Hook for fetching a specific research by ID
  */
-export function useGetResearchById(researchId?: string) {
+export function useGetResearchById(researchId?: string, polling = false) {
   const { getAuthToken } = useAuth();
 
   return useQuery({
@@ -50,8 +54,21 @@ export function useGetResearchById(researchId?: string) {
 
       const token = await getAuthToken();
       const response = await getResearchById(researchId, token || undefined);
-      // Handle both direct response and response.data patterns
+      
+      // Return null for not found
+      if (!response) {
+        return null;
+      }
+      
       return response as RequestResearchOutput;
+    },
+    // Enable polling if requested and the status is pending
+    refetchInterval: (query) => {
+      const data = query.state.data as RequestResearchOutput | null;
+      if (polling && data && data.researchStatus === ResearchStatus.PENDING) {
+        return 30000; // Poll every 30 seconds if status is pending
+      }
+      return false; // No polling if completed or failed
     },
     enabled: !!researchId,
   });
