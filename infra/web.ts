@@ -80,10 +80,9 @@ export const frontend = new sst.aws.Nextjs("MyWeb", {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: clerkClientPublishableKey.value,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: stripePublishableKey.value,
     CLERK_SECRET_KEY: clerkClientSecretKey.value,
+    NEXT_PUBLIC_BACKEND_API_URL: api.url,
   },
 });
-
-let frontendUrl = frontend.url || 'http://localhost:3000'
 
 api.route("POST /checkout", {
   link: [...apiResources, frontend],

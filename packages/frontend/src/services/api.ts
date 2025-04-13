@@ -1,9 +1,8 @@
-'use server';
+
 
 import { RequestResearchInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
-import { Resource } from "sst";
 
-const API_URL = Resource.BackendApi.url;
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 const API_CONFIG = {
   baseUrl: API_URL,

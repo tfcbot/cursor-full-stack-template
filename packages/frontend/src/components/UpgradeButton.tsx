@@ -4,7 +4,7 @@ import { useCheckout } from '../hooks/useCheckout';
 
 export function UpgradeButton() {
   const { startCheckout, isLoading } = useCheckout();
-  
+  console.log("START CHECKOUT RENDERING");
   return (
     <button
       onClick={() => startCheckout()}

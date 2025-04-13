@@ -29,6 +29,14 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "RedirectFailureUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "RedirectSuccessUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Research": {
       "name": string
       "type": "sst.aws.Dynamo"
