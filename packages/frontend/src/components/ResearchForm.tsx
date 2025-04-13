@@ -30,7 +30,6 @@ export function ResearchForm() {
   
   return (
     <div className="bg-bg-secondary p-8 rounded-lg shadow-card border border-border">
-      <h1 className="text-2xl font-bold mb-6 text-fg-primary">Submit Research Task</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -55,15 +54,17 @@ export function ResearchForm() {
           </div>
         )}
         
-        <button
-          type="submit"
-          disabled={isPending}
-          className={`w-full py-3 px-4 bg-accent-primary text-fg-primary rounded-md font-medium ${
-            isPending ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-90'
-          }`}
-        >
-          {isPending ? 'Researching...' : 'Submit Research Task'}
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isPending}
+            className={`py-2 px-4 bg-accent-primary text-fg-primary rounded-md font-medium ${
+              isPending ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-90'
+            }`}
+          >
+            {isPending ? 'Researching...' : 'Submit Research Task'}
+          </button>
+        </div>
       </form>
     </div>
   );
