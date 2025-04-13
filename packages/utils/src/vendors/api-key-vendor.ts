@@ -5,6 +5,7 @@ import {
   QueryCommand 
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { UpdateUserCreditsCommand } from "@metadata/credits.schema";
 import { Resource } from "sst";
 
 export interface ValidUser {
@@ -148,6 +149,35 @@ export class ApiKeyService {
       throw new Error('Unauthorized');
     }
   }
+
+  /**
+   * Update user credits through Unkey API
+   */
+  async updateUserCredits(command: UpdateUserCreditsCommand): Promise<{ credits: number }> {
+    console.log('Updating user credits for user:', command.userId, 'operation:', command.operation, 'amount:', command.amount);
+    
+    try {
+      // Update the remaining credits on the API key
+      const { result, error } = await this.unkey.keys.updateRemaining({
+        keyId: command.keyId,
+        op: command.operation === 'increment' ? 'increment' : 'decrement',
+        value: command.amount
+      });
+      
+      if (error) {
+        throw new Error(`Failed to update credits: ${error.message}`);
+      }
+      
+      const newCredits = result.remaining || 0;
+      
+      return { credits: newCredits };
+    } catch (error) {
+      console.error('Error updating user credits:', error);
+      throw error;
+    }
+  }
+
+  
 }
 
 export const apiKeyService = new ApiKeyService();

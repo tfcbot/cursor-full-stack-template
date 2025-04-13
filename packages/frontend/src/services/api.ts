@@ -1,4 +1,4 @@
-import { RequestResearchInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
+import { RequestResearchFormInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
@@ -107,7 +107,7 @@ export const getResearchById = async (researchId: string, token?: string): Promi
   }
 }
 
-export const postResearch = async (requestData: RequestResearchInput, token?: string): Promise<RequestResearchOutput> => {
+export const postResearch = async (requestData: RequestResearchFormInput, token: string): Promise<RequestResearchOutput> => {
   const absoluteUrl = await getAbsoluteUrl('/research');
   try {
     const response = await fetch(absoluteUrl, {
