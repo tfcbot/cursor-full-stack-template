@@ -51,7 +51,7 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
         try {
             const userDetailsFromAuthHeader = await this.getValidUserFromAuthHeader(event);          
             if (userDetailsFromAuthHeader) {
-                console.info('User found in auth header', userDetailsFromAuthHeader);
+                console.info('User found in auth header');
                 return userDetailsFromAuthHeader;
             }
             throw new Error('Unable to Validate User. Provide a token');
