@@ -22,16 +22,16 @@ async function handleCheckoutSessionCompleted(session: CheckoutSessionCompleted)
   console.log('Handling checkout session completed:', session.id);
   
   try {
-    if (!session.metadata || !session.metadata.userId) {
-      throw new Error('Missing userId in session metadata');
+    if (!session.metadata || !session.metadata.userId || !session.metadata.keyId) {
+      throw new Error('Missing userId or keyId in session metadata');
     }
     
     const userId = session.metadata.userId;
     const amount = session.metadata.amount ? Number(session.metadata.amount) : 5; // Default to 5 credits
-    
+    const keyId = session.metadata.keyId;
     const result = await apiKeyAdapter.updateUserCredits({
       userId,
-      keyId: session.id,
+      keyId: session.metadata.keyId,
       operation: 'increment',
       amount
     });

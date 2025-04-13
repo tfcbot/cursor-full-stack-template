@@ -13,7 +13,8 @@ export const checkoutAdapter = async (event: APIGatewayProxyEventV2): Promise<AP
     const validUser = await svm.getValidUser(event);
     
     const params: CheckoutSessionInput = CheckoutSessionInputSchema.parse({ 
-      userId: validUser.userId 
+      userId: validUser.userId,
+      keyId: validUser.keyId
     });
     
     const session = await createCheckoutSessionUseCase(params);  

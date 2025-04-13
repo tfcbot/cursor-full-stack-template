@@ -60,9 +60,3 @@ export const OnboardUserInputSchema = BaseTaskPayloadSchema.extend({
 })
 
 export type OnboardUserInput = z.infer<typeof OnboardUserInputSchema>;
-
-export interface IUserAdapter {
-    getRemainingCredits(input: GetRemainingCreditsInput): Promise<GetRemainingCreditsOutput>;
-}
-
-

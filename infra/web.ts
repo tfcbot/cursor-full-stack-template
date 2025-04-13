@@ -43,7 +43,7 @@ api.route("POST /research", {
 })
 
 
-api.route("POST /webhook", {
+api.route("POST /stripe-webhook", {
   link: [...apiResources],
   handler: "./packages/functions/src/billing.api.webhookHandler",
  

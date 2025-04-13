@@ -15,7 +15,6 @@ export interface ValidUser {
 export interface SaveApiKeyCommand {
   keyId: string;
   userId: string;
-  apiKey: string;
   name?: string;
   expires?: string;
 }
@@ -106,7 +105,6 @@ export class ApiKeyService {
       meta: {
         userId: params.userId,
       },
-      enabled: true,
     });
 
     if (!result.result) {
@@ -116,7 +114,6 @@ export class ApiKeyService {
     await this.apiKeyRepository.saveApiKey({
       keyId: result.result.keyId,
       userId: params.userId,
-      apiKey: result.result.key,
       name: params.name,
       expires: params.expires?.toISOString(),
     });
