@@ -1,9 +1,18 @@
 import { z } from "zod";
-import { randomUUID } from "crypto";
+import { v4 as uuidv4 } from 'uuid';
+
+export enum ResearchStatus {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed"
+} 
+
+
 
 export const RequestResearchInputSchema = z.object({
     prompt: z.string(),
-    id: z.string().default(randomUUID()),
+    id: z.string().optional().default(uuidv4()),
+    userId: z.string().optional(),
 });
 
 export const systemPrompt = `
@@ -31,6 +40,8 @@ export const RequestResearchOutputSchema = z.object({
     title: z.string(), 
     content: z.string(),
     citation_links: z.array(z.string()),
+    researchStatus: z.nativeEnum(ResearchStatus).default(ResearchStatus.PENDING),
+    userId: z.string().optional(),
 });
 
 export const GetResearchInputSchema = z.object({    

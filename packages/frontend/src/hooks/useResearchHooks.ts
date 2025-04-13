@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { RequestResearchInput, RequestResearchOutput } from '@metadata/agents/research-agent.schema';
+import { RequestResearchInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
 import { useAuth } from './useAuth';
 
@@ -29,7 +29,10 @@ export function useGetAllResearch() {
     queryKey: ['allResearch'],
     queryFn: async () => {
       const token = await getAuthToken();
-      const response = await getAllResearch(token || undefined);
+      if (!token) {
+        return null;
+      }
+      const response = await getAllResearch(token);
       return response;
     },
   });
@@ -49,9 +52,29 @@ export function useGetResearchById(researchId?: string) {
       }
 
       const token = await getAuthToken();
+      
+      // Add a cache-busting parameter to ensure we don't get cached responses
+      const timestamp = new Date().getTime();
+      console.log(`Fetching research ${researchId} at ${timestamp}`);
+      
       const response = await getResearchById(researchId, token || undefined);
-      // Handle both direct response and response.data patterns
+      
+      // Return null for not found
+      if (!response) {
+        return null;
+      }
+      
       return response as RequestResearchOutput;
+    },
+    // Add conditional polling for pending research
+    refetchInterval: (query) => {
+      const data = query.state.data as RequestResearchOutput | null;
+      
+      if (data?.researchStatus === ResearchStatus.PENDING) {
+        return 5000; // Poll every 5 seconds if pending
+      }
+      
+      return false; // No polling for completed research
     },
     enabled: !!researchId,
   });
