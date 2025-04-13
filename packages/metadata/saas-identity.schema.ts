@@ -19,5 +19,4 @@ export interface ISaasIdentityVendingMachine {
   decodeJwt(token: string): Promise<JwtPayload>
   getValidUserFromAuthHeader(event: APIGatewayProxyEventV2): Promise<ValidUser | null>
   getValidUser(event: APIGatewayProxyEventV2): Promise<ValidUser>
-  validateWebhookEvent(event: APIGatewayProxyEventV2): Promise<WebhookEvent>
 }

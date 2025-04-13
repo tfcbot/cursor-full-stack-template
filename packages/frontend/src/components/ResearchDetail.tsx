@@ -42,13 +42,9 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
         </Link>
       </div>
       
-      <div className="text-fg-tertiary text-sm">
-        Generated on {new Date(research.createdAt).toLocaleDateString()} at {new Date(research.createdAt).toLocaleTimeString()}
-      </div>
-      
       <div className="bg-bg-secondary p-6 rounded-lg shadow-card border border-border">
         <div className="prose prose-invert prose-headings:text-fg-primary prose-p:text-fg-secondary prose-a:text-accent-secondary max-w-none">
-          {research.content.split('\n\n').map((paragraph, index) => (
+          {research.content.split('\n\n').map((paragraph: string, index: number) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>

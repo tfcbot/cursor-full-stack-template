@@ -1,20 +1,7 @@
 import { ResearchDetail } from '../../../components/ResearchDetail';
 
-type Params = {
-  id: string;
-};
-
-type Props = {
-  params: Params;
-};
-
-export default function ResearchDetailPage({ params }: Props) {
-  return <ResearchDetail researchId={params.id} />;
-}
-
-export function generateMetadata({ params }: Props) {
-  return {
-    title: `Research: ${params.id} - Research Agent`,
-    description: `View generated research details for ID: ${params.id}`,
-  };
+export default async function DemoPage({ params }: { params: Promise<{ id: string }> }) {
+  // then get id like this
+  const id = (await params).id;
+  return <ResearchDetail researchId={id} />;
 }

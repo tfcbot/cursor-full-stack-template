@@ -34,6 +34,7 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
             const parsedJwt = DecodedJwtSchema.parse(decodedJwt);
             const userDetails: ValidUser = {
                 userId: parsedJwt.sub,
+                keyId: parsedJwt.metadata?.keyId,
             };
             const isValidUserDetailsAuthHeader = ValidUserSchema.safeParse(userDetails);
             if (isValidUserDetailsAuthHeader.success) {
@@ -53,23 +54,10 @@ export class SaaSIdentityVendingMachine implements ISaasIdentityVendingMachine {
                 console.info('User found in auth header', userDetailsFromAuthHeader);
                 return userDetailsFromAuthHeader;
             }
-            throw new Error('Unable to Validate User. Provide a valid api key or access token');
-        
+            throw new Error('Unable to Validate User. Provide a token');
         } catch (error) {
             console.error('Error getting user details:', error);
             throw new Error('Unauthorized');
-        }
-    }
-    
-    async validateWebhook(event: APIGatewayProxyEventV2): Promise<any> {
-        try {
-            if (!this.jwtService) {
-                throw new Error('JWT service not initialized');
-            }
-            return await this.jwtService.validateWebhookEvent(event);
-        } catch (error) {
-            console.error('Error validating webhook:', error);
-            throw new Error('Invalid webhook payload');
         }
     }
 }

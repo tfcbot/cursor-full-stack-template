@@ -3,8 +3,8 @@ import { Saga } from '../../../../lib/transaction.util';
 import { userAdapter } from './user-management.adapter';
 
 export class UserRegistrationSagaBuilder {
-  private newUserData: NewUser;
-  private generatedApiKey: string | undefined;
+  private newUserData!: NewUser;
+  private generatedKeyId!: string;
 
   constructor() {}
 
@@ -45,13 +45,13 @@ export class UserRegistrationSagaBuilder {
     saga.addStep<string>({
       execute: async () => {
         console.info("Executing step: Generate API keys");
-        this.generatedApiKey = await userAdapter.generateApiKeys(this.newUserData.userId);
-        return this.generatedApiKey;
+        this.generatedKeyId = await userAdapter.generateApiKeys(this.newUserData.userId);
+        return this.generatedKeyId;
       },
       compensate: async () => {
         console.info("Compensating step: Generate API keys - deleting keys");
-        if (this.generatedApiKey) {
-          await userAdapter.deleteApiKeys(this.newUserData.userId, this.generatedApiKey);
+        if (this.generatedKeyId) {
+          await userAdapter.deleteApiKeys(this.newUserData.userId, this.generatedKeyId);
         }
       }
     });
@@ -60,16 +60,16 @@ export class UserRegistrationSagaBuilder {
     saga.addStep<void>({
       execute: async () => {
         console.info("Executing step: Save API key to database");
-        if (this.generatedApiKey) {
-          await userAdapter.saveApiKeyToDatabase(this.newUserData.userId, this.generatedApiKey);
+        if (this.generatedKeyId) {
+          await userAdapter.saveApiKeyToDatabase(this.newUserData.userId, this.generatedKeyId);
         } else {
           throw new Error('No API key generated to save to database');
         }
       },
       compensate: async () => {
         console.info("Compensating step: Save API key to database - removing saved key");
-        if (this.generatedApiKey) {
-          await userAdapter.removeApiKeyFromDatabase(this.newUserData.userId, this.generatedApiKey);
+        if (this.generatedKeyId) {
+          await userAdapter.removeApiKeyFromDatabase(this.newUserData.userId, this.generatedKeyId);
         }
       }
     });
@@ -79,6 +79,7 @@ export class UserRegistrationSagaBuilder {
       execute: async () => {
         console.info("Executing step: Update user claims in auth provider");
         const claimsData = {
+          keyId: this.generatedKeyId,
           hasApiKey: true,
           userStatus: 'active',
           registrationCompleted: true,

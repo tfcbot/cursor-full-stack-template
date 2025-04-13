@@ -4,6 +4,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { NewUser, User, UpdateUserOnboardingDetailsInput } from '@metadata/user.schema';
 import { authManagerAdapter } from './auth-manager.adapter';
 import { UpdatePropertyCommandInput } from '@metadata/jwt.schema';
+import { Resource } from "sst";
 
 export interface IUserAdapter {
   registerUser(user: NewUser): Promise<void>;
@@ -37,7 +38,7 @@ export class UserAdapter implements IUserAdapter {
       };
       
       const command = new PutCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Item: userData,
       });
     
@@ -52,7 +53,7 @@ export class UserAdapter implements IUserAdapter {
   async getUserData(userId: string): Promise<User | null> {
     try {
       const command = new GetCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId }
       });
 
@@ -103,7 +104,7 @@ export class UserAdapter implements IUserAdapter {
       }
 
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
         UpdateExpression: `SET ${updateExpressionParts.join(', ')}`,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -124,12 +125,13 @@ export class UserAdapter implements IUserAdapter {
       // Use the Unkey service to generate a secure API key
       const result = await apiKeyService.createApiKey({
         userId,
-        name: `API Key for ${userId}`
+        name: `API Key for ${userId}`,
+        
       });
       
       console.info("API key generated successfully for user:", userId);
       
-      return result.key;
+      return result.keyId;
     } catch (error) {
       console.error("Error generating API key:", error);
       throw new Error("Failed to generate API key");
@@ -140,7 +142,7 @@ export class UserAdapter implements IUserAdapter {
     console.info("Deleting API keys for user:", userId);
     try {
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
         UpdateExpression: "REMOVE apiKey SET updatedAt = :updatedAt",
         ExpressionAttributeValues: {
@@ -171,7 +173,7 @@ export class UserAdapter implements IUserAdapter {
       // In a real system, integrate with an email service provider
       // For demonstration, we'll just update a field to indicate the email was sent
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
         UpdateExpression: "SET welcomeEmailSent = :sent, updatedAt = :updatedAt",
         ExpressionAttributeValues: {
@@ -192,12 +194,12 @@ export class UserAdapter implements IUserAdapter {
     console.info("Saving API key to database for user:", userId);
     try {
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
-        UpdateExpression: "SET keyId = :keyId, status = :status, updatedAt = :updatedAt",
+        UpdateExpression: "SET keyId = :keyId, apiKeystatus = :apiKeystatus, updatedAt = :updatedAt",
         ExpressionAttributeValues: {
           ":keyId": apiKey,
-          ":status": "ACTIVE",
+          ":apiKeystatus": "ACTIVE",
           ":updatedAt": new Date().toISOString()
         }
       });
@@ -214,11 +216,11 @@ export class UserAdapter implements IUserAdapter {
     console.info("Marking welcome email as cancelled for user:", userId);
     try {
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
-        UpdateExpression: "SET welcomeEmailStatus = :status, updatedAt = :updatedAt",
+        UpdateExpression: "SET welcomeEmailStatus = :welcomeEmailStatus, updatedAt = :updatedAt",
         ExpressionAttributeValues: {
-          ":status": "CANCELLED",
+          ":welcomeEmailStatus": "CANCELLED",
           ":updatedAt": new Date().toISOString()
         }
       });
@@ -253,7 +255,7 @@ export class UserAdapter implements IUserAdapter {
     console.info("Removing API key from database for user:", userId);
     try {
       const command = new UpdateCommand({
-        TableName: "Users",
+        TableName: Resource.Users.name,
         Key: { userId },
         UpdateExpression: "REMOVE keyId, status SET updatedAt = :updatedAt",
         ExpressionAttributeValues: {

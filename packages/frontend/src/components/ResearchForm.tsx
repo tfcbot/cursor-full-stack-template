@@ -7,7 +7,7 @@ import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
 
 export function ResearchForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState<RequestResearchInput>({
+  const [formData, setFormData] = useState<Partial<RequestResearchInput>>({
     prompt: '',
   });
   
@@ -21,7 +21,7 @@ export function ResearchForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    mutate(formData, {
+    mutate(formData as RequestResearchInput, {
       onSuccess: () => {
         router.push(`/research/`);
       }

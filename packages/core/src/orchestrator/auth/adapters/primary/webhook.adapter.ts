@@ -2,6 +2,7 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { SaaSIdentityVendingMachine } from '@utils/tools/saas-identity';
 import { processWebhookUseCase } from '../../usecases/process-webhook.usecase';
 import { MessageSchema } from '@metadata/saas-identity.schema';
+import { ClerkService } from '@utils/vendors/jwt-vendor';
 
 export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   console.info("Auth webhook adapter received event:", event.headers['svix-id']);
@@ -15,8 +16,8 @@ export const authWebhookAdapter = async (event: APIGatewayProxyEventV2): Promise
     
     try {
       // Validate the webhook event with Clerk
-      const svm = new SaaSIdentityVendingMachine();
-      webhookEvent = await svm.validateWebhook(event);
+      const clerkService = new ClerkService();
+      webhookEvent = await clerkService.validateWebhookEvent(event);
       console.info("Validated webhook event of type:", webhookEvent.type);
     } catch (err) {
       console.error('Webhook validation failed:', err);

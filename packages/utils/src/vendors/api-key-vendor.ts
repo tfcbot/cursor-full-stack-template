@@ -102,10 +102,11 @@ export class ApiKeyService {
       apiId: this.apiId,
       name: params.name || `API Key for ${params.userId}`,
       ownerId: params.userId,
+      remaining: 100,
       meta: {
         userId: params.userId,
       },
-      expires: params.expires ? Math.floor(params.expires.getTime() / 1000) : undefined,
+      enabled: true,
     });
 
     if (!result.result) {
