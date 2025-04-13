@@ -21,10 +21,11 @@ export async function createSession(params: CheckoutSessionInput) {
   console.log('Creating checkout session for user:', params.userId);
   const stripeSecretKey = Resource.StripeSecretKey.value;
   const stripe = Stripe(stripeSecretKey);
-  const redirectSuccessUrl = Resource.RedirectSuccessUrl.value;
-  const redirectFailureUrl = Resource.RedirectFailureUrl.value;
-  const idempotencyKey = randomUUID();
 
+
+  const appDomain = Resource.MyWeb.url?.includes('unavailable') ? 'http://localhost:3000' : Resource.MyWeb.url;
+  
+  const idempotencyKey = randomUUID();
   try {
     const creditsPerUnit = 5;
     const totalCredits = params.quantity * creditsPerUnit;
@@ -50,8 +51,8 @@ export async function createSession(params: CheckoutSessionInput) {
         },
       ],
       mode: 'payment',
-      success_url: redirectSuccessUrl,
-      cancel_url: redirectFailureUrl,
+      success_url: `${appDomain}/`,
+      cancel_url: `${appDomain}/`,
       metadata: metadata
     }, {
       idempotencyKey
