@@ -2,17 +2,23 @@
 
 import { useState } from 'react';
 import { initiateCheckout } from '../services/creditService';
+import { useAuth } from './useAuth';
+
 
 export function useCheckout() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { getAuthToken } = useAuth();
 
   const startCheckout = async () => {
     setIsLoading(true);
     setError(null);
-    
     try {
-      const { url } = await initiateCheckout();
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('No token found');
+      }
+      const { url } = await initiateCheckout(token);
       
       // Redirect to the checkout URL
       if (url) {
