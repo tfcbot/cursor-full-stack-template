@@ -34,10 +34,8 @@ export function useCheckout() {
       }
       // Redirect to Checkout
       const { error } = await stripe.redirectToCheckout({ sessionId: id });
-
       
       // Redirect to the checkout URL
-      console.log("I HAVE THE ID", id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to initiate checkout');
     } finally {

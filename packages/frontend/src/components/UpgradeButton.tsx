@@ -2,16 +2,15 @@
 
 import { useCheckout } from '../hooks/useCheckout';
 
-export function UpgradeButton() {
+export function BuyCreditsButton() {
   const { startCheckout, isLoading } = useCheckout();
-  console.log("START CHECKOUT RENDERING");
   return (
     <button
       onClick={() => startCheckout()}
       disabled={isLoading}
       className="bg-accent-primary hover:bg-accent-secondary text-white font-medium rounded-md px-4 py-1.5 text-sm transition-colors disabled:opacity-70"
     >
-      {isLoading ? 'Processing...' : 'Upgrade'}
+      {isLoading ? 'Processing...' : 'Buy Credits'}
     </button>
   );
 } 

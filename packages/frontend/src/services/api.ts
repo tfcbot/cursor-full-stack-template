@@ -1,5 +1,3 @@
-
-
 import { RequestResearchInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
@@ -73,7 +71,31 @@ export const getResearchById = async (researchId: string, token?: string): Promi
     if (!response.ok) {
       throw new Error(`Failed to fetch deep research: ${response.status} ${response.statusText}`);
     }
-    return response.json();
+    
+    const data = await response.json();
+    
+    // Log the raw response for debugging
+    console.log('API response for research:', data);
+    
+    // Handle different response formats
+    if (data && typeof data === 'object') {
+      // Check if data is directly the research object
+      if (data.researchId && data.title && data.content) {
+        return data as RequestResearchOutput;
+      }
+      
+      // Check if wrapped in data property
+      if (data.data && typeof data.data === 'object') {
+        return data.data as RequestResearchOutput;
+      }
+      
+      // Check if wrapped in body property
+      if (data.body && typeof data.body === 'object') {
+        return data.body as RequestResearchOutput;
+      }
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error fetching research:', error);
     return null;

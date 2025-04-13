@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Credits } from './Credits';
-import { UpgradeButton } from './UpgradeButton';
+import { BuyCreditsButton } from './UpgradeButton';
 import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 
 export function Navbar() {
@@ -21,7 +21,7 @@ export function Navbar() {
         
         <div className="flex items-center space-x-6">
           <Credits />
-          <UpgradeButton />
+          <BuyCreditsButton />
           <NavLink href="/" active={pathname === '/'}>
             Submit Task
           </NavLink>

@@ -1,4 +1,3 @@
-
 import { parseApiResponse, UserCreditsResponseSchema } from "@metadata/api-response.schema";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
@@ -12,8 +11,6 @@ const API_CONFIG = {
 };
 
 export const getAbsoluteUrl = async (path: string): Promise<string> => {
-  console.log("GETTING ABSOLUTE URL")
-  console.log('API_CONFIG.baseUrl', API_CONFIG.baseUrl);
   return `${API_CONFIG.baseUrl}${path}`;
 };
 
@@ -53,10 +50,7 @@ export const getUserCredits = async (token: string): Promise<number> => {
 }
 
 export async function initiateCheckout(token: string): Promise<string> {
-  
   const absoluteUrl = await getAbsoluteUrl('/checkout');
-  console.log('CALLING CHECKOUT API', API_URL);
-  console.log('absoluteUrl', absoluteUrl);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'POST',
@@ -68,7 +62,6 @@ export async function initiateCheckout(token: string): Promise<string> {
     }
     
     const data = await response.json() as { id: string };
-    console.log('CHECKOUT SESSION ID:', data.id);
     return data.id;
   } catch (error) {
     console.error('Error initiating checkout:', error);
