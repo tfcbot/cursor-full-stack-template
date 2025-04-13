@@ -52,7 +52,7 @@ const researchEventParser: EventParser<RequestResearchInput> = (
  * Configuration options for the research generation adapter
  */
 const researchAdapterOptions: LambdaAdapterOptions = {
-  requireAuth: false,
+  requireAuth: true,
   requireBody: true,
   requiredFields: ['prompt']
 };
@@ -67,7 +67,7 @@ const createPendingResearch = async (input: RequestResearchInput) => {
     title: `Research for: ${input.prompt.substring(0, 50)}...`,
     content: '',
     citation_links: [],
-    status: ResearchStatus.PENDING,
+    researchStatus: ResearchStatus.PENDING,
   });
 
   await researchRepository.saveResearch(initialResearch);
@@ -80,7 +80,7 @@ const createPendingResearch = async (input: RequestResearchInput) => {
  */
 const publishMessageUsecase = async (input: RequestResearchInput) => {
   // Create a pending research entry
-  const pendingResearch = await createPendingResearch(input);
+  await createPendingResearch(input);
   
   // Publish the message to the queue
   topicPublisher.publishAgentMessage({

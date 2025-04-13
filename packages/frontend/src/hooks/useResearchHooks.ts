@@ -35,14 +35,13 @@ export function useGetAllResearch() {
       const response = await getAllResearch(token);
       return response;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds to check for status updates
   });
 }
 
 /**
  * Hook for fetching a specific research by ID
  */
-export function useGetResearchById(researchId?: string, polling = false) {
+export function useGetResearchById(researchId?: string) {
   const { getAuthToken } = useAuth();
 
   return useQuery({
@@ -53,6 +52,11 @@ export function useGetResearchById(researchId?: string, polling = false) {
       }
 
       const token = await getAuthToken();
+      
+      // Add a cache-busting parameter to ensure we don't get cached responses
+      const timestamp = new Date().getTime();
+      console.log(`Fetching research ${researchId} at ${timestamp}`);
+      
       const response = await getResearchById(researchId, token || undefined);
       
       // Return null for not found
@@ -62,13 +66,15 @@ export function useGetResearchById(researchId?: string, polling = false) {
       
       return response as RequestResearchOutput;
     },
-    // Enable polling if requested and the status is pending
+    // Add conditional polling for pending research
     refetchInterval: (query) => {
       const data = query.state.data as RequestResearchOutput | null;
-      if (polling && data && data.researchStatus === ResearchStatus.PENDING) {
-        return 30000; // Poll every 30 seconds if status is pending
+      
+      if (data?.researchStatus === ResearchStatus.PENDING) {
+        return 5000; // Poll every 5 seconds if pending
       }
-      return false; // No polling if completed or failed
+      
+      return false; // No polling for completed research
     },
     enabled: !!researchId,
   });

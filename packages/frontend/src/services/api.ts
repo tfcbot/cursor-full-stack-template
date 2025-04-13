@@ -18,6 +18,9 @@ export const getAbsoluteUrl = async (path: string): Promise<string> => {
 export const getHeaders = async (token?: string): Promise<HeadersInit> => {
   const headers: Record<string, string> = {
     ...API_CONFIG.defaultHeaders,
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   };
   
   if (token) {
@@ -28,7 +31,8 @@ export const getHeaders = async (token?: string): Promise<HeadersInit> => {
 };
 
 export const getAllResearch = async (token?: string): Promise<RequestResearchOutput[]> => {
-  const absoluteUrl = await getAbsoluteUrl('/research');
+  const timestamp = new Date().getTime();
+  const absoluteUrl = await getAbsoluteUrl(`/research?_t=${timestamp}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
@@ -62,7 +66,8 @@ export const getAllResearch = async (token?: string): Promise<RequestResearchOut
 }
 
 export const getResearchById = async (researchId: string, token?: string): Promise<RequestResearchOutput | null> => {
-  const absoluteUrl = await getAbsoluteUrl(`/research/${researchId}`);
+  const timestamp = new Date().getTime();
+  const absoluteUrl = await getAbsoluteUrl(`/research/${researchId}?_t=${timestamp}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
