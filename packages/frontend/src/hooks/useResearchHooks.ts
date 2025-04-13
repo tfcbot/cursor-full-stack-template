@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { RequestResearchInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
+import { RequestResearchFormInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
 import { useAuth } from './useAuth';
 
@@ -12,9 +12,12 @@ export function useRequestResearch() {
   const { getAuthToken } = useAuth();
 
   return useMutation({
-    mutationFn: async (request: RequestResearchInput) => {
+    mutationFn: async (request: RequestResearchFormInput) => {
       const token = await getAuthToken();
-      return await postResearch(request, token || undefined);
+      if (!token) {
+        throw new Error('No token found');
+      }
+      return await postResearch(request, token);
     },
   });
 }

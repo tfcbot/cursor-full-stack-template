@@ -20,7 +20,8 @@ import { Topic } from '@metadata/orchestrator.schema';
 import { Queue } from '@metadata/orchestrator.schema';
 import { topicPublisher } from '@lib/topic-publisher.adapter';
 import { researchRepository } from '@agent-runtime/researcher/adapters/secondary/datastore.adapter';
-
+import { apiKeyService } from '@utils/vendors/api-key-vendor';
+import { UpdateUserCreditsCommand } from '@metadata/credits.schema';
 /**
  * Parser function that transforms the API Gateway event into the format
  * expected by the research generation use case.
@@ -58,9 +59,28 @@ const researchAdapterOptions: LambdaAdapterOptions = {
 };
 
 /**
+ * Decrement user credits
+ */
+const decrementUserCredits = async (input: UpdateUserCreditsCommand) => {
+  await apiKeyService.updateUserCredits({
+    userId: input.userId,
+    keyId: input.keyId,
+    operation: 'decrement',
+    amount: 1
+  });
+};
+
+/**
  * Creates an initial pending research entry in the database
  */
 const createPendingResearch = async (input: RequestResearchInput) => {
+  await decrementUserCredits({
+      userId: input.userId,
+      keyId: input.keyId,
+      operation: 'decrement',
+      amount: 1
+  });
+
   const initialResearch = RequestResearchOutputSchema.parse({
     researchId: input.id,
     userId: input.userId,

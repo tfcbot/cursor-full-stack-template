@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequestResearch } from '../hooks/useResearchHooks';
-import { RequestResearchInput } from '@metadata/agents/research-agent.schema';
+import { RequestResearchFormInput } from '@metadata/agents/research-agent.schema';
 
 export function ResearchForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState<Partial<RequestResearchInput>>({
+  const [formData, setFormData] = useState<Partial<RequestResearchFormInput>>({
     prompt: '',
   });
   
@@ -21,7 +21,7 @@ export function ResearchForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    mutate(formData as RequestResearchInput, {
+    mutate(formData as RequestResearchFormInput, {
       onSuccess: () => {
         router.push(`/research/`);
       }

@@ -8,11 +8,15 @@ export enum ResearchStatus {
 } 
 
 
+export const RequestResearchFormInputSchema = z.object({
+    prompt: z.string(),
+});
 
 export const RequestResearchInputSchema = z.object({
     prompt: z.string(),
     id: z.string().optional().default(uuidv4()),
-    userId: z.string().optional(),
+    userId: z.string(),
+    keyId: z.string(),
 });
 
 export const systemPrompt = `
@@ -55,3 +59,4 @@ export const citationsSchema = z.object({
 export type RequestResearchOutput = z.infer<typeof RequestResearchOutputSchema>;
 export type RequestResearchInput = z.infer<typeof RequestResearchInputSchema>;
 export type GetResearchInput = z.infer<typeof GetResearchInputSchema>; 
+export type RequestResearchFormInput = z.infer<typeof RequestResearchFormInputSchema>;
