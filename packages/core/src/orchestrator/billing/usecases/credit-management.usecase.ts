@@ -1,6 +1,7 @@
 import { GetUserCreditsInput } from "@metadata/credits.schema";
 import { apiKeyAdapter } from "../adapters/secondary/api-key.adapter";
 
+
 export async function getUserCreditsUseCase(input: GetUserCreditsInput) {
   try {
 
@@ -11,7 +12,5 @@ export async function getUserCreditsUseCase(input: GetUserCreditsInput) {
     };
   } catch (error) {
     console.error("Error getting user credits:", error);
-    // Return 0 credits on error to avoid breaking user experience
-    return { credits: 0, userId: input.userId };
   }
 }

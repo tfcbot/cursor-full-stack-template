@@ -64,5 +64,14 @@ api.route("GET /credits", {
   handler: "./packages/functions/src/billing.api.getUserCreditsHandler",
 })
 
-
+api.route("POST /register", { 
+  link: [...apiResources],
+  handler: "./packages/functions/src/auth.api.registerWebhookHandler",
+  permissions: [
+    {
+        actions: ["dynamodb:*", "dynamodb:PutItem"],
+        resources: [usersTable.arn]
+    }
+],
+})
 

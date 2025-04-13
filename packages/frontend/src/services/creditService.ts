@@ -1,6 +1,8 @@
 'use server';
 
 import { Resource } from "sst";
+import { parseApiResponse, UserCreditsResponseSchema } from "@metadata/api-response.schema";
+
 const API_URL = Resource.BackendApi.url;
 
 const API_CONFIG = {
@@ -15,7 +17,7 @@ export const getAbsoluteUrl = async (path: string): Promise<string> => {
   return `${API_CONFIG.baseUrl}${path}`;
 };
 
-export const getHeaders = async (token?: string): Promise<HeadersInit> => {
+export const getHeaders = async (token: string): Promise<HeadersInit> => {
   const headers: Record<string, string> = {
     ...API_CONFIG.defaultHeaders,
   };
@@ -27,8 +29,8 @@ export const getHeaders = async (token?: string): Promise<HeadersInit> => {
   return headers;
 };
 
-export const getUserCredits = async (token?: string): Promise<number> => {
-  const absoluteUrl = await getAbsoluteUrl('/user/credits');
+export const getUserCredits = async (token: string): Promise<number> => {
+  const absoluteUrl = await getAbsoluteUrl('/credits');
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
@@ -39,25 +41,18 @@ export const getUserCredits = async (token?: string): Promise<number> => {
       throw new Error(`Failed to fetch credits: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
+    const responseData = await response.json();
     
-    // Handle different response formats
-    if (typeof data.credits === 'number') {
-      return data.credits;
-    } else if (data && typeof data === 'object' && typeof data.remainingCredits === 'number') {
-      return data.remainingCredits;
-    }
-    
-    // If we reach here, the response format was unexpected
-    console.error('Unexpected response format from getUserCredits:', data);
-    return 0;
+    // Use the shared schema parser which handles both unwrapped and wrapped responses
+    const parsedData = parseApiResponse(responseData, UserCreditsResponseSchema);
+    return parsedData.credits;
   } catch (error) {
     console.error('Error fetching credits:', error);
     return 0;
   }
 }
 
-export const initiateCheckout = async (token?: string): Promise<{ url: string }> => {
+export const initiateCheckout = async (token: string): Promise<{ url: string }> => {
   const absoluteUrl = await getAbsoluteUrl('/checkout');
   try {
     const response = await fetch(absoluteUrl, {
@@ -71,6 +66,11 @@ export const initiateCheckout = async (token?: string): Promise<{ url: string }>
     
     const data = await response.json();
     
+    // Parse with the schema if you've defined a CheckoutResponseSchema
+    // const parsedData = parseApiResponse(data, CheckoutResponseSchema);
+    // return parsedData;
+    
+    // For now, keep the existing logic
     if (typeof data.url === 'string') {
       return { url: data.url };
     }

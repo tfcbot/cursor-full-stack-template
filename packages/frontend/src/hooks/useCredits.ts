@@ -11,7 +11,10 @@ export function useUserCredits() {
     queryKey: ['userCredits'],
     queryFn: async () => {
       const token = await getAuthToken();
-      const credits = await getUserCredits(token || undefined);
+      if (!token) {
+        throw new Error('No token found');
+      }
+      const credits = await getUserCredits(token);
       return credits;
     },
     refetchInterval: 60000, // Refetch every minute

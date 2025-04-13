@@ -1,18 +1,13 @@
 import { NewUser } from '@metadata/user.schema';
-import { userAdapter } from '../adapters/secondary/user-management.adapter';
+import { userRegistrationSagaBuilder } from '../adapters/secondary/user-registration.saga';
 
 export async function registerUserUseCase(newUserData: NewUser): Promise<{ message: string }> {
   console.info("Processing register user usecase for:", newUserData.userId);
   
   try {
-    // Store user in database
-    await userAdapter.registerUser(newUserData);
-    
-    // Here you can also add code to:
-    // 1. Create initial API keys for the user
-    // 2. Send welcome emails
-    // 3. Set up default preferences
-    // 4. Assign to user groups
+    // Build and execute the saga for user registration
+    const saga = userRegistrationSagaBuilder.forUser(newUserData).build();
+    await saga.execute();
     
     return {
       message: 'User registered successfully'

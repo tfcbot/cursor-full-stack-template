@@ -17,7 +17,7 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
-    "ClerkWebhookSecret": {
+    "ClerkClientWebhookSecret": {
       "type": "sst.sst.Secret"
       "value": string
     }

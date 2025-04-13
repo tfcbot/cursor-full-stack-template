@@ -21,9 +21,9 @@ export class ClerkService implements IJwtService {
   private clerkWebhookSecret: string;
 
   constructor() {
-    this.clerkClientSecretKey = process.env.CLERK_SECRET_KEY || "";
-    this.clerkClientPublishableKey = process.env.CLERK_PUBLISHABLE_KEY || "";
-    this.clerkWebhookSecret = process.env.CLERK_WEBHOOK_SECRET || "";
+    this.clerkClientSecretKey = Resource.ClerkClientSecretKey.value;
+    this.clerkClientPublishableKey = Resource.ClerkClientPublishableKey.value;
+    this.clerkWebhookSecret = Resource.ClerkClientWebhookSecret.value;
 
     this.clerkClient = createClerkClient({
       secretKey: this.clerkClientSecretKey,
