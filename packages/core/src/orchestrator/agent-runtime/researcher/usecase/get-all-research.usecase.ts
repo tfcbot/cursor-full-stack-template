@@ -1,40 +1,36 @@
 /**
- * Get All Research Usecase
+ * Get User Research Usecase
  * 
- * This module provides the implementation for retrieving all research entries.
- * It processes the request and returns a list of all research results.
+ * This module provides the implementation for retrieving all research entries for a specific user.
+ * It processes the request and returns a list of research results for the authenticated user.
  */
 
 import { Message } from '@metadata/message.schema';
-import { RequestResearchOutput } from '@metadata/agents/research-agent.schema';
+import { RequestResearchOutput, GetAllUserResearchInput } from '@metadata/agents/research-agent.schema';
 import { researchRepository } from '../adapters/secondary/datastore.adapter';
 
 /**
- * Executes the process to retrieve all research entries
+ * Executes the process to retrieve all research entries for a user
  * 
  * This usecase:
  * 1. Processes the request through the research repository
- * 2. Returns all research results
+ * 2. Returns all research results for the specified user
  * 
- * @returns A message with all research results
+ * @param input - The input containing the user ID
+ * @returns A message with the user's research results
  */
-export const getAllResearchUsecase = async (): Promise<Message> => {
-  console.info("Getting all research entries");
+export const getUserResearchUsecase = async (input: GetAllUserResearchInput): Promise<Message> => {
+  console.info("Getting research entries for user:", input.userId);
 
   try {
-    // Since we don't have a userId in this context, we're getting all research
-    // In a real application, you might want to filter by userId or other criteria
-    const allResearch = await researchRepository.getAllResearch();
-    
-    // Ensure we're returning an array even if the database returns null or undefined
-    const safeResearchList: RequestResearchOutput[] = allResearch || [];
+    const userResearch = await researchRepository.getResearchByUserId(input.userId);
     
     return {
-      message: 'All research retrieved successfully',
-      data: safeResearchList, // Return the array directly, not nested in 'data'
+      message: 'User research retrieved successfully',
+      data: userResearch,
     };
   } catch (error) {
-    console.error('Error retrieving research:', error);
-    throw new Error('Failed to retrieve research');
+    console.error('Error retrieving user research:', error);
+    throw new Error('Failed to retrieve user research');
   }
 }; 

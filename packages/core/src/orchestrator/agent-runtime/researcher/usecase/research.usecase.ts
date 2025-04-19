@@ -1,4 +1,4 @@
-import { RequestResearchInput, ResearchStatus } from '@metadata/agents/research-agent.schema';
+import { SaveResearchSchema, RequestResearchInput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 import { Message } from '@metadata/message.schema';
 import { runResearch } from '../adapters/secondary/openai.adapter';
 import { researchRepository } from '../adapters/secondary/datastore.adapter';
@@ -11,7 +11,11 @@ export const runResearchUsecase = async (input: RequestResearchInput): Promise<M
     const research = await runResearch(input);
     console.info("Research completed successfully");
     research.researchStatus = ResearchStatus.COMPLETED; 
-    const message = await researchRepository.saveResearch(research);
+    const researchWithUserId = SaveResearchSchema.parse({
+      ...research,
+      userId: input.userId
+    });
+    const message = await researchRepository.saveResearch(researchWithUserId);
     console.info("Research saved successfully");
     return {
       message: message

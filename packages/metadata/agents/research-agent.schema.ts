@@ -38,6 +38,15 @@ Generate research according to the following prompt:
 
 ${input.prompt}
 `
+export const PendingResearchSchema = z.object({
+    researchId: z.string(),
+    userId: z.string(),
+    title: z.string(), 
+    content: z.string(),
+    citation_links: z.array(z.string()),
+    researchStatus: z.nativeEnum(ResearchStatus).default(ResearchStatus.PENDING),
+});
+
 
 export const RequestResearchOutputSchema = z.object({
     researchId: z.string(),
@@ -45,11 +54,23 @@ export const RequestResearchOutputSchema = z.object({
     content: z.string(),
     citation_links: z.array(z.string()),
     researchStatus: z.nativeEnum(ResearchStatus).default(ResearchStatus.PENDING),
-    userId: z.string().optional(),
 });
 
-export const GetResearchInputSchema = z.object({    
+export const SaveResearchSchema = z.object({
     researchId: z.string(),
+    userId: z.string(),
+    title: z.string(), 
+    content: z.string(),
+    citation_links: z.array(z.string()),
+});
+
+export const GetResearchInputSchema = z.object({  
+    userId: z.string(),
+    researchId: z.string(),
+});
+
+export const GetAllUserResearchInputSchema = z.object({
+    userId: z.string(),
 });
 
 export const citationsSchema = z.object({
@@ -60,3 +81,6 @@ export type RequestResearchOutput = z.infer<typeof RequestResearchOutputSchema>;
 export type RequestResearchInput = z.infer<typeof RequestResearchInputSchema>;
 export type GetResearchInput = z.infer<typeof GetResearchInputSchema>; 
 export type RequestResearchFormInput = z.infer<typeof RequestResearchFormInputSchema>;
+export type GetAllUserResearchInput = z.infer<typeof GetAllUserResearchInputSchema>;
+export type SaveResearchInput = z.infer<typeof SaveResearchSchema>;
+export type PendingResearch = z.infer<typeof PendingResearchSchema>;

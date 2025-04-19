@@ -1,12 +1,11 @@
 import { DynamoDBDocumentClient, PutCommand, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { RequestResearchOutput, RequestResearchOutputSchema } from '@metadata/agents/research-agent.schema';
+import { SaveResearchInput, RequestResearchOutput, RequestResearchOutputSchema } from '@metadata/agents/research-agent.schema';
 import { Resource } from 'sst';
 
 export interface ResearchRepository {
-  saveResearch(research: RequestResearchOutput): Promise<string>;
+  saveResearch(research: SaveResearchInput): Promise<string>;
   getResearchById(researchId: string): Promise<RequestResearchOutput | null>;
   getResearchByUserId(userId: string): Promise<RequestResearchOutput[]>;
-  getAllResearch(): Promise<RequestResearchOutput[]>;
 }
 
 export const createResearchRepository = (
@@ -15,7 +14,7 @@ export const createResearchRepository = (
   const tableName = Resource.Research.name
   console.info("Saving research to table", tableName);
   return {
-    async saveResearch(research: RequestResearchOutput): Promise<string> {
+    async saveResearch(research: SaveResearchInput): Promise<string> {
 
       await dynamoDbClient.send(
         new PutCommand({
@@ -60,22 +59,6 @@ export const createResearchRepository = (
         return [];
       }
 
-      return response.Items.map((item) => RequestResearchOutputSchema.parse(item));
-    },
-    
-    async getAllResearch(): Promise<RequestResearchOutput[]> {
-      // Note: Scan operations should be used carefully in production as they can be expensive
-      const response = await dynamoDbClient.send(
-        new ScanCommand({
-          TableName: tableName,
-          Limit: 100, // Limiting the number of items to avoid excessive reads
-        })
-      );
-      
-      if (!response.Items || response.Items.length === 0) {
-        return [];
-      }
-      
       return response.Items.map((item) => RequestResearchOutputSchema.parse(item));
     }
   };
