@@ -45,11 +45,14 @@ export const RequestResearchOutputSchema = z.object({
     content: z.string(),
     citation_links: z.array(z.string()),
     researchStatus: z.nativeEnum(ResearchStatus).default(ResearchStatus.PENDING),
-    userId: z.string().optional(),
 });
 
 export const GetResearchInputSchema = z.object({    
     researchId: z.string(),
+});
+
+export const GetAllResearchInputSchema = z.object({
+    userId: z.string(),
 });
 
 export const citationsSchema = z.object({

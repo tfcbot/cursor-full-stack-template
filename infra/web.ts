@@ -1,4 +1,3 @@
-
 import { 
   researchTable, usersTable, userKeysTable
 } from "./database";
@@ -28,13 +27,13 @@ export const apiResources = [
 
 api.route("GET /research", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getAllResearchHandler",
 })
 
 // Add a route for getting a specific research item by ID
 api.route("GET /research/{id}", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.getResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getResearchByIdHandler",
 })
 
 api.route("POST /research", {
