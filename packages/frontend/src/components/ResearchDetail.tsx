@@ -201,7 +201,7 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
   
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Back navigation link - moved to the top left */}
+      {/* Back navigation link */}
       <div className="mb-4 pt-2">
         <Link 
           href="/research" 
@@ -214,7 +214,7 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
         </Link>
       </div>
       
-      {/* Header with title */}
+      {/* Header with title and action buttons */}
       <div className="mb-8 pb-6 border-b border-border">
         <div>
           <div className="max-w-3xl">
@@ -224,6 +224,34 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
             {getTitle().subtitle && (
               <p className="text-sm text-fg-tertiary">{getTitle().subtitle}</p>
             )}
+          </div>
+          
+          {/* Action buttons below title, justified right */}
+          <div className="flex gap-4 mt-4 justify-end">
+            <button 
+              className={`flex items-center px-4 py-2 rounded-md transition-colors text-sm ${
+                copySuccess 
+                  ? 'bg-success text-white' 
+                  : 'bg-bg-tertiary text-fg-primary hover:bg-bg-secondary'
+              }`}
+              onClick={handleCopyToClipboard}
+              disabled={!content}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
+            </button>
+            
+            <Link
+              href={`/`}
+              className="flex items-center px-4 py-2 bg-accent-primary text-fg-primary rounded-md hover:bg-accent-secondary transition-colors text-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Submit New Task
+            </Link>
           </div>
         </div>
       </div>
@@ -279,34 +307,6 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
             </ul>
           </div>
         )}
-      </div>
-      
-      {/* Action buttons */}
-      <div className="flex flex-wrap gap-4 mt-8">
-        <button 
-          className={`flex items-center px-6 py-3 rounded-md transition-colors ${
-            copySuccess 
-              ? 'bg-success text-white' 
-              : 'bg-bg-tertiary text-fg-primary hover:bg-bg-secondary'
-          }`}
-          onClick={handleCopyToClipboard}
-          disabled={!content}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-          </svg>
-          {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
-        </button>
-        
-        <Link
-          href={`/`}
-          className="flex items-center px-6 py-3 bg-accent-primary text-fg-primary rounded-md hover:bg-accent-secondary transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Submit New Task
-        </Link>
       </div>
     </div>
   );

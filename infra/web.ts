@@ -27,7 +27,7 @@ export const apiResources = [
 
 api.route("GET /research", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.getAllResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getAllUserResearchHandler",
 })
 
 // Add a route for getting a specific research item by ID

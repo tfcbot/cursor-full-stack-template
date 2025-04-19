@@ -25,11 +25,13 @@ const getResearchByIdEventParser: EventParser<GetResearchInput> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
-  const researchId = event.pathParameters?.id || '';
-  
+  if (!event.pathParameters?.id) {
+    throw new Error('Research ID is required');
+  }
+
   return {
     userId: validUser.userId,
-    researchId: researchId
+    researchId: event.pathParameters.id
   };
 };
 
@@ -37,7 +39,7 @@ const getResearchByIdEventParser: EventParser<GetResearchInput> = (
  * Configuration options for the research adapter
  */
 const researchByIdAdapterOptions: LambdaAdapterOptions = {
-  requireAuth: false,
+  requireAuth: true,
   requireBody: false // GET requests don't have a body
 };
 

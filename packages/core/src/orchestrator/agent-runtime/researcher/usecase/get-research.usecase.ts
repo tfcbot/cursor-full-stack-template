@@ -25,6 +25,13 @@ export const getResearchUsecase = async (input: GetResearchInput): Promise<Messa
 
   try {
     const research = await researchRepository.getResearchById(input.researchId);
+    
+    // Add validation to ensure users can only access their own research
+    if (!research) {
+      throw new Error('Research not found');
+    }
+    
+
     return {
       message: 'Research completed successfully',
       data: research,

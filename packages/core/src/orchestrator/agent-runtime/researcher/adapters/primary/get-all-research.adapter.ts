@@ -1,7 +1,7 @@
 /**
- * Get All Research Adapter
+ * Get User Research Adapter
  * 
- * This module provides a Lambda adapter for retrieving all research items.
+ * This module provides a Lambda adapter for retrieving research items for the authenticated user.
  * It uses the lambda adapter factory to create a standardized Lambda handler
  * with authentication, validation, and error handling.
  */
@@ -14,49 +14,44 @@ import {
 } from '@lib/lambda-adapter.factory';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
-import { getAllResearchUsecase } from '@agent-runtime/researcher/usecase/get-all-research.usecase';
+import { getUserResearchUsecase } from '@agent-runtime/researcher/usecase/get-all-research.usecase';
 import { z } from 'zod';
+import { GetAllUserResearchInput, GetAllUserResearchInputSchema } from '@metadata/agents/research-agent.schema';
 
-// Empty schema since we don't need any specific input for getting all research
-const GetAllResearchSchema = z.object({});
-
-// Define the type based on the schema
-type GetAllResearchRequest = z.infer<typeof GetAllResearchSchema>;
 
 /**
  * Parser function that transforms the API Gateway event into the format
- * expected by the get all research use case
+ * expected by the get user research use case
  */
-const getAllResearchEventParser: EventParser<GetAllResearchRequest> = (
+const getAllResearchEventParser: EventParser<GetAllUserResearchInput> = (
   event: APIGatewayProxyEventV2,
   validUser: ValidUser
 ) => {
-  // No specific parsing needed - returning empty object
-  return {};
+  return {
+    userId: validUser.userId
+  };
 };
 
 /**
- * Configuration options for the get all research adapter
+ * Configuration options for the get all user research adapter
  */
-const getAllResearchAdapterOptions: LambdaAdapterOptions = {
-  requireAuth: false,
+const getAllUserResearchAdapterOptions: LambdaAdapterOptions = {
+  requireAuth: true,
   requireBody: false // GET requests don't have a body
 };
 
 /**
- * Lambda adapter for handling get all research requests
+ * Lambda adapter for handling get user research requests
  * 
  * This adapter:
- * 1. Validates there's no specific input needed
- * 2. Executes the get all research use case
- * 3. Formats and returns the response with all research items
+ * 1. Validates authentication
+ * 2. Executes the get user research use case with the authenticated user's ID
+ * 3. Formats and returns the response with the user's research items
  */
-export const getAllResearchAdapter = createLambdaAdapter({
-  schema: GetAllResearchSchema,
-  useCase: async () => {
-    return await getAllResearchUsecase();
-  },
+export const getAllUserResearchAdapter = createLambdaAdapter({
+  schema: GetAllUserResearchInputSchema,
+  useCase: getUserResearchUsecase,
   eventParser: getAllResearchEventParser,
-  options: getAllResearchAdapterOptions,
+  options: getAllUserResearchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
 }); 

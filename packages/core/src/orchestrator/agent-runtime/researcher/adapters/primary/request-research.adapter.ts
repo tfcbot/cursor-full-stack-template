@@ -12,7 +12,7 @@ import {
     LambdaAdapterOptions,
     GetUserInfo
   } from '@lib/lambda-adapter.factory';
-import { RequestResearchInputSchema, RequestResearchInput, ResearchStatus, RequestResearchOutputSchema } from "@metadata/agents/research-agent.schema";
+import { RequestResearchInputSchema, RequestResearchInput, ResearchStatus, PendingResearchSchema } from "@metadata/agents/research-agent.schema";
 import { OrchestratorHttpResponses } from '@metadata/http-responses.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
@@ -81,7 +81,7 @@ const createPendingResearch = async (input: RequestResearchInput) => {
       amount: 1
   });
 
-  const initialResearch = RequestResearchOutputSchema.parse({
+  const initialResearch = PendingResearchSchema.parse({
     researchId: input.id,
     userId: input.userId,
     title: `Research for: ${input.prompt.substring(0, 50)}...`,
