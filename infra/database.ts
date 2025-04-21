@@ -11,7 +11,6 @@ export const researchTable = new sst.aws.Dynamo("Research", {
     }
 })
 
-
 export const usersTable = new sst.aws.Dynamo("Users", {
     fields: {
         userId: "string"
@@ -31,3 +30,13 @@ export const userKeysTable = new sst.aws.Dynamo("UserKeys", {
         StatusIndex: { hashKey: "apiKeystatus" }
     }
 })
+
+export const eventDeduplicationTable = new sst.aws.Table("EventDeduplication", {
+  fields: {
+    eventId: "string",
+    processedAt: "string",
+    ttl: "number",
+  },
+  primaryIndex: { partitionKey: "eventId" },
+  timeToLiveAttribute: "ttl",
+});

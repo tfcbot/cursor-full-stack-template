@@ -14,6 +14,13 @@ export const createSQSHandler = (handlerFn: (event: any) => Promise<any>): SQSHa
   };
 };
 
+export const createEventBridgeHandler = (handlerFn: (event: any) => Promise<any>): Handler => {
+  return async (event) => {
+    const response = await handlerFn(event);
+    return response;
+  };
+};
+
 export const createDynamoDBStreamHandler = (
   handlerFn: (
     event: any,

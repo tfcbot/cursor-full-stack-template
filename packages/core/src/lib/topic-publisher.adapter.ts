@@ -1,46 +1,38 @@
-import { SNSClient, PublishCommand } from "@aws-sdk/client-sns"
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge"
 import { Topic } from "@metadata/orchestrator.schema"
 import { AgentMessage } from "@metadata/task.schema";
-
 
 import { Resource } from "sst";
 
 export class TopicPublisher {
-  private snsClient: SNSClient;
-  private topicArns: Record<Topic, string>;
+  private ebClient: EventBridgeClient;
 
   constructor() {
-    this.snsClient = new SNSClient({});
-    this.topicArns = {
-        [Topic.task]: Resource.TaskTopic.arn
-    };
+    this.ebClient = new EventBridgeClient({});
   }
 
   async publishAgentMessage(message: AgentMessage): Promise<void> {
-    const topicArn = this.topicArns[Topic.task];
-    console.log("--- Publishing agent message to topic ---");
+    console.log("--- Publishing agent message to EventBridge ---");
     try {
-      await this.snsClient.send(new PublishCommand({
-        TopicArn: topicArn,
-        Message: JSON.stringify(message.payload),
-        MessageAttributes: {
-          queue: {
-            DataType: 'String',
-            StringValue: message.queue
+      await this.ebClient.send(new PutEventsCommand({
+        Entries: [
+          {
+            EventBusName: Resource.TaskBus.name,
+            Source: "task",
+            DetailType: message.queue,
+            Detail: JSON.stringify({
+              ...message.payload,
+              queue: message.queue
+            })
           }
-        }, 
-         MessageGroupId: message.queue,
-         MessageDeduplicationId: message.payload.id
+        ]
       }));
-      console.log("--- Agent message published to topic ---");
+      console.log("--- Agent message published to EventBridge ---");
     } catch (error) {
-      console.error('Error publishing to topic:', error);
-      throw new Error('Failed to publish to topic');
+      console.error('Error publishing to EventBridge:', error);
+      throw new Error('Failed to publish to EventBridge');
     }
   }
-
-
-
 }
 
 export const topicPublisher = new TopicPublisher();

@@ -1,45 +1,40 @@
-import { researchTable } from "./database"
+import { researchTable, eventDeduplicationTable } from "./database"
 import { secrets } from "./secrets"
 
-// Topics
-export const TaskTopic = new sst.aws.SnsTopic("TaskTopic", {
-  fifo: true
-})
+// EventBridge Bus
+export const TaskBus = new sst.aws.Bus("TaskBus")
 
-export const researchQueue = new sst.aws.Queue("ResearchQueue")  
-
-
-TaskTopic.subscribeQueue(
-  "ResearchQueue", 
-  researchQueue.arn, 
-  {
-    filter: {
-      "queue": ["research"]
+// Subscribe the research lambda to the bus
+TaskBus.subscribe("ResearchSubscriber", {
+  handler: "./packages/functions/src/agent-runtime.api.generateResearchReportHandler",
+  pattern: {
+    source: ["task"],
+    detail: {
+      queue: ["research"]
     }
   }
-)
+})
 
-
-researchQueue.subscribe({
-  handler: "./packages/functions/src/agent-runtime.api.generateResearchReportHandler", 
+// Link the bus to resources
+new sst.aws.Function("ResearchFunction", {
+  handler: "./packages/functions/src/agent-runtime.api.generateResearchReportHandler",
   link: [
-      researchTable, 
-      ...secrets,
-      TaskTopic
-  ], 
+    researchTable,
+    eventDeduplicationTable,
+    ...secrets,
+    TaskBus
+  ],
   permissions: [
     {
       actions: [
-        "dynamodb:PutItem", 
-        "dynamodb:GetItem", 
-        "dynamodb:Query",
-        "sqs:DeleteMessage"
-      ], 
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+      ],
       resources: [
         researchTable.arn,
-        researchQueue.arn
+        eventDeduplicationTable.arn
       ]
-    }, 
+    },
   ],
 })
-
