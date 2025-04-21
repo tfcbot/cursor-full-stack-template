@@ -3,6 +3,7 @@ import { z } from 'zod';
 export enum HttpStatusCode {
   OK = 200,
   CREATED = 201,
+  ACCEPTED = 202,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -10,7 +11,6 @@ export enum HttpStatusCode {
   INTERNAL_SERVER_ERROR = 500,
   INSUFFICIENT_CREDITS = 429,
 }
-
 
 export const HttpResponseBodySchema = z.object({
   message: z.string(),
@@ -52,6 +52,8 @@ export const HttpResponses = {
     createHttpResponse(HttpStatusCode.OK, params),
   CREATED: (params: HttpResponseParams<HttpResponseBody>) => 
     createHttpResponse(HttpStatusCode.CREATED, params),
+  ACCEPTED: (params: HttpResponseParams<any>) => 
+    createHttpResponse(HttpStatusCode.ACCEPTED, params),
   BAD_REQUEST: (params: HttpResponseParams<HttpResponseBody>) => 
     createHttpResponse(HttpStatusCode.BAD_REQUEST, params),
   UNAUTHORIZED: (params: HttpResponseParams<HttpResponseBody>) => 

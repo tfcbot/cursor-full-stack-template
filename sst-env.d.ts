@@ -41,10 +41,6 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Dynamo"
     }
-    "ResearchQueue": {
-      "type": "sst.aws.Queue"
-      "url": string
-    }
     "StripePublishableKey": {
       "type": "sst.sst.Secret"
       "value": string
@@ -56,10 +52,6 @@ declare module "sst" {
     "StripeWebhookSecret": {
       "type": "sst.sst.Secret"
       "value": string
-    }
-    "TaskTopic": {
-      "arn": string
-      "type": "sst.aws.SnsTopic"
     }
     "UnkeyApiId": {
       "type": "sst.sst.Secret"

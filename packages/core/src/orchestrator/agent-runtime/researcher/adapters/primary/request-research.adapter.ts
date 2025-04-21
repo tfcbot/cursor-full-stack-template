@@ -16,12 +16,11 @@ import { RequestResearchInputSchema, RequestResearchInput, ResearchStatus, Pendi
 import { OrchestratorHttpResponses } from '@metadata/http-responses.schema';
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
-import { Topic } from '@metadata/orchestrator.schema';
-import { Queue } from '@metadata/orchestrator.schema';
-import { topicPublisher } from '@lib/topic-publisher.adapter';
-import { researchRepository } from '@agent-runtime/researcher/adapters/secondary/datastore.adapter';
 import { apiKeyService } from '@utils/vendors/api-key-vendor';
 import { UpdateUserCreditsCommand } from '@metadata/credits.schema';
+import { runResearchUsecase } from '../../usecase/research.usecase';
+import { researchRepository } from '@agent-runtime/researcher/adapters/secondary/datastore.adapter';
+
 /**
  * Parser function that transforms the API Gateway event into the format
  * expected by the research generation use case.
@@ -91,25 +90,29 @@ const createPendingResearch = async (input: RequestResearchInput) => {
   });
 
   await researchRepository.saveResearch(initialResearch);
+  return initialResearch;
 };
 
 /**
- * Use case for publishing a research generation request.
- * The input parameter will contain the complete request object returned by researchEventParser,
- * which includes the user information from getUserInfo.
+ * Use case for directly executing research request.
+ * This replaces the previous message publishing approach with direct execution.
+ * The function creates a pending entry, returns it immediately, and then
+ * asynchronously processes the research request.
  */
-const publishMessageUsecase = async (input: RequestResearchInput) => {
+const executeResearchUsecase = async (input: RequestResearchInput) => {
   // Create a pending research entry
-  await createPendingResearch(input);
+  const pendingResearch = await createPendingResearch(input);
   
-  // Publish the message to the queue
-  topicPublisher.publishAgentMessage({
-    topic: Topic.task,
-    id: randomUUID(),
-    timestamp: new Date().toISOString(),
-    queue: Queue.research,
-    payload: input
+  // Start the research process asynchronously
+  // We don't await this so we can return the pending state immediately
+  runResearchUsecase(input).catch(error => {
+    console.error('Error executing research:', error);
+    // In a production system, you might want to update the research status to ERROR
+    // and provide error details in the database
   });
+
+  // Return the pending research entry immediately
+  return pendingResearch;
 }
 
 /**
@@ -118,13 +121,13 @@ const publishMessageUsecase = async (input: RequestResearchInput) => {
  * This adapter:
  * 1. Validates the request body
  * 2. Parses and validates the input using researchEventParser
- * 3. Executes the research generation use case with the combined user and request data
- * 4. Formats and returns the response
+ * 3. Creates a pending research entry and returns it immediately with a 202 status
+ * 4. Asynchronously executes the research process
  */
 export const requestResearchAdapter = createLambdaAdapter({
   schema: RequestResearchInputSchema,
-  useCase: publishMessageUsecase,
+  useCase: executeResearchUsecase,
   eventParser: researchEventParser,
   options: researchAdapterOptions,
-  responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: { message: 'Research generation request published' } })
-}); 
+  responseFormatter: (result) => OrchestratorHttpResponses.ACCEPTED({ body: result })
+});

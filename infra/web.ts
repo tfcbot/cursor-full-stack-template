@@ -2,26 +2,17 @@ import {
   researchTable, usersTable, userKeysTable
 } from "./database";
 
-import { 
-TaskTopic, researchQueue 
-} from "./orchestrator";
-
 import { clerkClientPublishableKey, clerkClientSecretKey, secrets, stripePublishableKey } from "./secrets";
 
 
 export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
-
-const topics = [TaskTopic]
 const tables = [researchTable, usersTable, userKeysTable]
-const queues = [researchQueue]
 
 export const apiResources = [
-  ...topics,
   ...tables,
-  ...secrets,
-  ...queues
+  ...secrets
 ]
 
 
