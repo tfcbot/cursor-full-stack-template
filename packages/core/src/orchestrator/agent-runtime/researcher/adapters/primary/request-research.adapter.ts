@@ -99,7 +99,7 @@ const createPendingResearch = async (input: RequestResearchInput) => {
  * The function creates a pending entry, returns it immediately, and then
  * asynchronously processes the research request.
  */
-const directExecuteResearchUsecase = async (input: RequestResearchInput) => {
+const executeResearchUsecase = async (input: RequestResearchInput) => {
   // Create a pending research entry
   const pendingResearch = await createPendingResearch(input);
   
@@ -126,7 +126,7 @@ const directExecuteResearchUsecase = async (input: RequestResearchInput) => {
  */
 export const requestResearchAdapter = createLambdaAdapter({
   schema: RequestResearchInputSchema,
-  useCase: directExecuteResearchUsecase,
+  useCase: executeResearchUsecase,
   eventParser: researchEventParser,
   options: researchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.ACCEPTED({ body: result })
