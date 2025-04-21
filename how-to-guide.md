@@ -418,3 +418,7 @@ If you encounter dependency issues:
 - Document new infrastructure components in the README or related documentation
 - Use feature branches and pull requests for infrastructure changes
 - Leverage the adapter factory patterns in `@lib` for consistent handling of AWS services
+
+Update or extend `packages/core/src/lib/event-emitter.adapter.ts`:
+
+// ... existing content ...

@@ -18,10 +18,11 @@ import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ValidUser } from '@metadata/saas-identity.schema';
 import { Topic } from '@metadata/orchestrator.schema';
 import { Queue } from '@metadata/orchestrator.schema';
-import { topicPublisher } from '@lib/topic-publisher.adapter';
+import { eventEmitter } from '@lib/event-emitter.adapter';
 import { researchRepository } from '@agent-runtime/researcher/adapters/secondary/datastore.adapter';
 import { apiKeyService } from '@utils/vendors/api-key-vendor';
 import { UpdateUserCreditsCommand } from '@metadata/credits.schema';
+
 /**
  * Parser function that transforms the API Gateway event into the format
  * expected by the research generation use case.
@@ -103,7 +104,7 @@ const publishMessageUsecase = async (input: RequestResearchInput) => {
   await createPendingResearch(input);
   
   // Publish the message to the queue
-  topicPublisher.publishAgentMessage({
+  eventEmitter.publishAgentMessage({
     topic: Topic.task,
     id: randomUUID(),
     timestamp: new Date().toISOString(),
@@ -127,4 +128,4 @@ export const requestResearchAdapter = createLambdaAdapter({
   eventParser: researchEventParser,
   options: researchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: { message: 'Research generation request published' } })
-}); 
+});

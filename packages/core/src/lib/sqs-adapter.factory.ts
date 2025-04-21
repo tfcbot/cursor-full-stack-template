@@ -62,7 +62,7 @@ export type MessageExtractor = (
 
 /**
  * Default message extractor that handles both direct payloads and SNS-wrapped messages.
- * Supports messages from topic-publisher and traditional payload format.
+ * Supports messages from event-emitter and traditional payload format.
  */
 export const defaultMessageExtractor: MessageExtractor = (record: SQSRecord): unknown => {
   // Parse the message body
@@ -74,7 +74,7 @@ export const defaultMessageExtractor: MessageExtractor = (record: SQSRecord): un
     try {
       const parsedMessage = JSON.parse(parsedBody.Message);
       console.log('parsedMessage', parsedMessage);
-      // Return the message as is - it's already the payload from topic-publisher
+      // Return the message as is - it's already the payload from event-emitter
       return parsedMessage;
     } catch (parseError) {
       throw new Error('Invalid SNS message format: ' + (parseError instanceof Error ? parseError.message : String(parseError)));
@@ -134,6 +134,35 @@ export interface SqsAdapterParams<TSchema extends ZodSchema, TInput = z.infer<TS
   /** Descriptive name for this adapter (used in logging) */
   adapterName: string;
 }
+
+/**
+ * Extracts the payload from an SQS message.
+ * Supports messages from event-emitter and traditional payload format.
+ */
+const extractPayload = (message: any): any => {
+  // Parse the message body
+  const parsedBody = JSON.parse(message);
+  
+  // Extract the message data - handle both direct payloads and SNS-wrapped messages
+  if (parsedBody.Message) {
+    // Handle SNS-wrapped message
+    try {
+      const parsedMessage = JSON.parse(parsedBody.Message);
+      console.log('parsedMessage', parsedMessage);
+      // Return the message as is - it's already the payload from event-emitter
+      return parsedMessage;
+    } catch (parseError) {
+      throw new Error('Invalid SNS message format: ' + (parseError instanceof Error ? parseError.message : String(parseError)));
+    }
+  } else {
+    // Handle direct payload
+    if (!parsedBody || typeof parsedBody !== 'object') {
+      throw new Error('Invalid message format in SQS message');
+    }
+    
+    return parsedBody.payload;
+  }
+};
 
 /**
  * Creates an SQS adapter function that handles common concerns like message parsing,
@@ -267,4 +296,4 @@ export const createSqsAdapter = <
       return handleError(error);
     }
   };
-}; 
+};

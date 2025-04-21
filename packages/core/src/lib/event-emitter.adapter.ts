@@ -4,7 +4,7 @@ import { AgentMessage } from "@metadata/task.schema";
 
 import { Resource } from "sst";
 
-export class TopicPublisher {
+export class EventEmitter {
   private ebClient: EventBridgeClient;
 
   constructor() {
@@ -35,4 +35,4 @@ export class TopicPublisher {
   }
 }
 
-export const topicPublisher = new TopicPublisher();
+export const eventEmitter = new EventEmitter();
