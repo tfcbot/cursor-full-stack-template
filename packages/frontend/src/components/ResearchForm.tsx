@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequestResearch } from '../hooks/useResearchHooks';
 import { RequestResearchFormInput } from '@metadata/agents/research-agent.schema';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function ResearchForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<Partial<RequestResearchFormInput>>({
     prompt: '',
   });
@@ -22,8 +24,14 @@ export function ResearchForm() {
     e.preventDefault();
     
     mutate(formData as RequestResearchFormInput, {
-      onSuccess: () => {
-        router.push(`/research/`);
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ['allResearch'] });
+        
+        if (data && data.researchId) {
+          router.push(`/research/${data.researchId}`);
+        } else {
+          router.push(`/research/`);
+        }
       }
     });
   };
@@ -68,4 +76,4 @@ export function ResearchForm() {
       </form>
     </div>
   );
-} 
+}

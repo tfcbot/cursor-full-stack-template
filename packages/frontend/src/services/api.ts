@@ -1,4 +1,5 @@
-import { RequestResearchFormInput, RequestResearchOutput } from "@metadata/agents/research-agent.schema";
+import { RequestResearchFormInput, RequestResearchOutput, ResearchStatus } from "@metadata/agents/research-agent.schema";
+import { randomUUID } from "crypto";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
@@ -110,10 +111,27 @@ export const getResearchById = async (researchId: string, token?: string): Promi
 export const postResearch = async (requestData: RequestResearchFormInput, token: string): Promise<RequestResearchOutput> => {
   const absoluteUrl = await getAbsoluteUrl('/research');
   try {
+    // Generate a client-side ID for optimistic updates
+    const clientGeneratedId = typeof window !== 'undefined' ? crypto.randomUUID() : randomUUID();
+    
+    // Create optimistic research object
+    const optimisticResearch: RequestResearchOutput = {
+      researchId: clientGeneratedId,
+      userId: '', // Will be filled by the server
+      title: `Research for: ${requestData.prompt.substring(0, 50)}...`,
+      content: 'Researching your topic...',
+      citation_links: [],
+      researchStatus: ResearchStatus.PENDING,
+      summary: ''
+    };
+
     const response = await fetch(absoluteUrl, {
       method: 'POST',
       headers: await getHeaders(token),
-      body: JSON.stringify(requestData),
+      body: JSON.stringify({
+        ...requestData,
+        id: clientGeneratedId // Send the client-generated ID to the server
+      }),
     });
 
     if (!response.ok) {
@@ -121,12 +139,20 @@ export const postResearch = async (requestData: RequestResearchFormInput, token:
       throw new Error(`Failed to post research: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    return response.json();
+    // Return the server response, which should now be the pending research with the same ID
+    const serverResponse = await response.json();
+    
+    // If the server returned a valid response, use it; otherwise, use our optimistic object
+    if (serverResponse && 
+        (serverResponse.researchId || 
+         (serverResponse.body && serverResponse.body.researchId) || 
+         (serverResponse.data && serverResponse.data.researchId))) {
+      return serverResponse;
+    }
+    
+    return optimisticResearch;
   } catch (error) {
     console.error('Error posting research:', error);
     throw error;
   }
 }
-
-
-

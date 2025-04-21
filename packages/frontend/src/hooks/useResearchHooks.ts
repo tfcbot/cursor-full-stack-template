@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { RequestResearchFormInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
 import { useAuth } from './useAuth';
@@ -10,6 +10,7 @@ import { useAuth } from './useAuth';
  */
 export function useRequestResearch() {
   const { getAuthToken } = useAuth();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (request: RequestResearchFormInput) => {
@@ -19,6 +20,19 @@ export function useRequestResearch() {
       }
       return await postResearch(request, token);
     },
+    onSuccess: (data) => {
+      // Add the new research to the cache immediately for optimistic updates
+      if (data && data.researchId) {
+        // Update the specific research query
+        queryClient.setQueryData(['research', data.researchId], data);
+        
+        // Update the all research list if it exists in the cache
+        const allResearch = queryClient.getQueryData<RequestResearchOutput[]>(['allResearch']);
+        if (allResearch) {
+          queryClient.setQueryData(['allResearch'], [data, ...allResearch]);
+        }
+      }
+    }
   });
 }
 
@@ -81,4 +95,4 @@ export function useGetResearchById(researchId?: string) {
     },
     enabled: !!researchId,
   });
-} 
+}
