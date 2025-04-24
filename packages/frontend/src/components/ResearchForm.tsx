@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRequestResearch } from '../hooks/useResearchHooks';
-import { RequestResearchFormInput } from '@metadata/agents/research-agent.schema';
+import { RequestAgentTaskFormInput } from '@metadata/agents/agent.schema';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function ResearchForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<Partial<RequestResearchFormInput>>({
+  const [formData, setFormData] = useState<Partial<RequestAgentTaskFormInput>>({
     prompt: '',
   });
   
@@ -23,12 +23,14 @@ export function ResearchForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    mutate(formData as RequestResearchFormInput, {
+    mutate(formData as RequestAgentTaskFormInput, {
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ['allResearch'] });
+        queryClient.invalidateQueries({ queryKey: ['allTasks'] });
         
-        if (data && data.researchId) {
-          router.push(`/research/${data.researchId}`);
+        // Support both taskId (new) and researchId (legacy)
+        const id = data?.taskId || data?.researchId;
+        if (id) {
+          router.push(`/research/${id}`);
         } else {
           router.push(`/research/`);
         }
@@ -42,7 +44,7 @@ export function ResearchForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="topic" className="block text-sm font-medium text-fg-secondary mb-1">
-            Research Topic
+            Task Description
           </label>
           <input
             type="text"
@@ -51,7 +53,7 @@ export function ResearchForm() {
             value={formData.prompt}
             onChange={handleChange}
             required
-            placeholder="Enter a topic to research"
+            placeholder="Enter a task description"
             className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary placeholder-fg-tertiary"
           />
         </div>
@@ -70,7 +72,7 @@ export function ResearchForm() {
               isPending ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-90'
             }`}
           >
-            {isPending ? 'Researching...' : 'Submit Research Task'}
+            {isPending ? 'Processing...' : 'Submit Task'}
           </button>
         </div>
       </form>

@@ -1,34 +1,21 @@
 'use client';
 
-import { useGetResearchById } from '@/src/hooks/useResearchHooks';
+import { useGetResearchById } from '../hooks/useResearchHooks';
+import { AgentTaskStatus } from '@metadata/agents/agent.schema';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
 
-// Define types to handle different response formats
-type ResearchDataWrapper = {
-  data: RequestResearchOutput;
-};
-
-type ResearchBodyWrapper = {
-  body: RequestResearchOutput;
-};
-
-// Union of all possible response structures
-type ResearchResponse = RequestResearchOutput | ResearchDataWrapper | ResearchBodyWrapper;
-
-export function ResearchDetail({ researchId }: { researchId: string }) {
-  // Fetch research data on component mount and page refresh
-  const { data: research, isLoading, isError } = useGetResearchById(researchId);
+export function ResearchDetail({ id }: { id: string }) {
+  const { data: task, isLoading, isError } = useGetResearchById(id);
   const [copySuccess, setCopySuccess] = useState(false);
   const [statusIndex, setStatusIndex] = useState(0);
   
-  // Cycling status messages for pending research
+  // Cycling status messages for pending tasks
   const pendingStatusMessages = [
     "Gathering information...",
-    "Researching your topic...",
+    "Processing your task...",
     "Analyzing relevant sources...",
-    "Compiling research data...",
+    "Compiling data...",
     "Almost there..."
   ];
   
@@ -41,121 +28,116 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
       
       return () => clearInterval(interval);
     }
-  }, [research]);
+  }, [task]);
 
-  // Helper function to check if research is pending
+  // Helper function to check if task is pending
   const isPending = () => {
-    if (!research) return false;
+    if (!task) return false;
     
-    // Cast research to ResearchResponse type for type safety
-    const researchData = research as unknown as ResearchResponse;
-    
-    if ('researchStatus' in researchData && researchData.researchStatus === ResearchStatus.PENDING) {
+    // Check for taskStatus or researchStatus (for backward compatibility)
+    if ('taskStatus' in task && task.taskStatus === AgentTaskStatus.PENDING) {
       return true;
     }
     
-    if ('data' in researchData && researchData.data && 
-        'researchStatus' in researchData.data && researchData.data.researchStatus === ResearchStatus.PENDING) {
+    if ('researchStatus' in task && task.researchStatus === 'pending') {
       return true;
     }
     
-    if ('body' in researchData && researchData.body && 
-        'researchStatus' in researchData.body && researchData.body.researchStatus === ResearchStatus.PENDING) {
-      return true;
+    if ('data' in task) {
+      const data = task.data;
+      if (data && 'taskStatus' in data && data.taskStatus === AgentTaskStatus.PENDING) {
+        return true;
+      }
+      if (data && 'researchStatus' in data && data.researchStatus === 'pending') {
+        return true;
+      }
+    }
+    
+    if ('body' in task) {
+      const body = task.body;
+      if (body && 'taskStatus' in body && body.taskStatus === AgentTaskStatus.PENDING) {
+        return true;
+      }
+      if (body && 'researchStatus' in body && body.researchStatus === 'pending') {
+        return true;
+      }
     }
     
     return false;
   };
 
-  // Helper function to get content based on different possible response structures
+  // Helper function to get content
   const getContent = () => {
-    if (!research) return null;
+    if (!task) return null;
     
-    // Cast research to ResearchResponse type for type safety
-    const researchData = research as unknown as ResearchResponse;
-    
-    // Handle different possible API response formats
-    if ('content' in researchData && typeof researchData.content === 'string') {
-      return researchData.content;
+    if ('content' in task && typeof task.content === 'string') {
+      return task.content;
     }
     
-    // Check if content is in a nested data structure
-    if ('data' in researchData && researchData.data && typeof researchData.data.content === 'string') {
-      return researchData.data.content;
+    if ('data' in task && task.data && typeof task.data.content === 'string') {
+      return task.data.content;
     }
     
-    // Check if it's in a body property
-    if ('body' in researchData && researchData.body && typeof researchData.body.content === 'string') {
-      return researchData.body.content;
+    if ('body' in task && task.body && typeof task.body.content === 'string') {
+      return task.body.content;
     }
     
-    console.log('Unrecognized research data structure:', research);
     return null;
   };
   
-  // Helper function to get title based on different possible response structures
+  // Helper function to get title
   const getTitle = () => {
-    if (!research) return { title: 'Research', subtitle: '' };
-    
-    // Cast research to ResearchResponse type for type safety
-    const researchData = research as unknown as ResearchResponse;
+    if (!task) return { title: 'Task', subtitle: '' };
     
     let title = '';
     let subtitle = '';
     
-    // Extract title and possible subtitle from different data structures
-    if ('title' in researchData && typeof researchData.title === 'string') {
-      // Process the title text to extract main title and subtitle if possible
-      const titleText = researchData.title
-        .replace(/^\*\*(.*)\*\*$/, '$1') // Remove markdown ** if present
-        .trim();
-        
-      // Handle common title patterns: "Title: Main Title" or just "Main Title"
-      const titleMatch = titleText.match(/^(?:Title:\s*)?[""]?(.+?)[""]?$/i);
-      
-      title = titleMatch ? titleMatch[1] : titleText;
-    }
-    
-    if ('data' in researchData && researchData.data && typeof researchData.data.title === 'string') {
-      const titleText = researchData.data.title
+    if ('title' in task && typeof task.title === 'string') {
+      const titleText = task.title
         .replace(/^\*\*(.*)\*\*$/, '$1')
         .trim();
         
-      const titleMatch = titleText.match(/^(?:Title:\s*)?[""]?(.+?)[""]?$/i);
+      const titleMatch = titleText.match(/^(?:Title:\s*)?[\""]?(.+?)[\""]?$/i);
       title = titleMatch ? titleMatch[1] : titleText;
     }
     
-    if ('body' in researchData && researchData.body && typeof researchData.body.title === 'string') {
-      const titleText = researchData.body.title
+    if ('data' in task && task.data && typeof task.data.title === 'string') {
+      const titleText = task.data.title
         .replace(/^\*\*(.*)\*\*$/, '$1')
         .trim();
         
-      const titleMatch = titleText.match(/^(?:Title:\s*)?[""]?(.+?)[""]?$/i);
+      const titleMatch = titleText.match(/^(?:Title:\s*)?[\""]?(.+?)[\""]?$/i);
       title = titleMatch ? titleMatch[1] : titleText;
     }
     
-    return { title: title || 'Research', subtitle };
+    if ('body' in task && task.body && typeof task.body.title === 'string') {
+      const titleText = task.body.title
+        .replace(/^\*\*(.*)\*\*$/, '$1')
+        .trim();
+        
+      const titleMatch = titleText.match(/^(?:Title:\s*)?[\""]?(.+?)[\""]?$/i);
+      title = titleMatch ? titleMatch[1] : titleText;
+    }
+    
+    return { title: title || 'Task', subtitle };
   };
 
   // Get citations if available
   const getCitations = () => {
-    if (!research) return [];
+    if (!task) return [];
     
-    // Cast research to ResearchResponse type for type safety
-    const researchData = research as unknown as ResearchResponse;
-    
-    if ('citation_links' in researchData && Array.isArray(researchData.citation_links)) {
-      return researchData.citation_links;
+    if ('citation_links' in task && Array.isArray(task.citation_links)) {
+      return task.citation_links;
     }
     
-    if ('data' in researchData && researchData.data && 
-        'citation_links' in researchData.data && Array.isArray(researchData.data.citation_links)) {
-      return researchData.data.citation_links;
+    if ('data' in task && task.data && 
+        'citation_links' in task.data && Array.isArray(task.data.citation_links)) {
+      return task.data.citation_links;
     }
     
-    if ('body' in researchData && researchData.body && 
-        'citation_links' in researchData.body && Array.isArray(researchData.body.citation_links)) {
-      return researchData.body.citation_links;
+    if ('body' in task && task.body && 
+        'citation_links' in task.body && Array.isArray(task.body.citation_links)) {
+      return task.body.citation_links;
     }
     
     return [];
@@ -173,24 +155,24 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
     return (
       <div className="flex flex-col justify-center items-center p-12 min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-accent-secondary border-t-transparent"></div>
-        <p className="mt-4 text-fg-secondary">Loading research...</p>
+        <p className="mt-4 text-fg-secondary">Loading task...</p>
       </div>
     );
   }
   
-  if (isError || !research) {
+  if (isError || !task) {
     return (
       <div className="bg-error bg-opacity-10 p-8 rounded-lg text-center">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <h2 className="text-xl text-error font-medium mt-4">Error Loading Research</h2>
-        <p className="text-fg-secondary mt-2">We couldn't load the requested research.</p>
+        <h2 className="text-xl text-error font-medium mt-4">Error Loading Task</h2>
+        <p className="text-fg-secondary mt-2">We couldn't load the requested task.</p>
         <Link 
           href="/research" 
           className="mt-6 inline-block px-6 py-3 bg-accent-primary text-fg-primary rounded-md hover:bg-accent-secondary transition-colors"
         >
-          Back to All Research
+          Back to All Tasks
         </Link>
       </div>
     );
@@ -210,7 +192,7 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to All Research
+          Back to All Tasks
         </Link>
       </div>
       
@@ -310,4 +292,4 @@ export function ResearchDetail({ researchId }: { researchId: string }) {
       </div>
     </div>
   );
-} 
+}
