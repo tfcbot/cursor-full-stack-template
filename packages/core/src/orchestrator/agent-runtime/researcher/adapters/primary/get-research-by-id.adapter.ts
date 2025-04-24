@@ -58,4 +58,45 @@ export const getResearchByIdAdapter = createLambdaAdapter({
   eventParser: getResearchByIdEventParser,
   options: researchByIdAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
-}); 
+});
+
+import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
+import { GetAgentTaskInput } from "@metadata/agents/agent.schema";
+import { HttpResponse } from "@utils/tools/http-status";
+import { SaasIdentity } from "@utils/tools/saas-identity";
+import { agentTaskRepository } from "../secondary/datastore.adapter";
+
+export const getAgentTaskByIdAdapter = async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
+  try {
+    const saasIdentity = new SaasIdentity(event);
+    const userId = saasIdentity.getUserId();
+
+    if (!userId) {
+      return HttpResponse.unauthorized("User not authenticated");
+    }
+
+    const taskId = event.pathParameters?.id;
+    if (!taskId) {
+      return HttpResponse.badRequest("Missing task ID");
+    }
+
+    const input: GetAgentTaskInput = {
+      userId,
+      taskId
+    };
+
+    const task = await agentTaskRepository.getTaskById(input);
+    
+    if (!task) {
+      return HttpResponse.notFound("Task not found");
+    }
+
+    return HttpResponse.ok(task);
+  } catch (error) {
+    console.error("Error in getAgentTaskByIdAdapter:", error);
+    return HttpResponse.internalServerError("Failed to retrieve task");
+  }
+};
+
+// For backward compatibility
+export const getResearchByIdAdapter = getAgentTaskByIdAdapter;

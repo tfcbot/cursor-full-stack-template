@@ -1,19 +1,19 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { RequestResearchFormInput, RequestResearchOutput, ResearchStatus } from '@metadata/agents/research-agent.schema';
+import { RequestAgentTaskFormInput, RequestAgentTaskOutput, AgentTaskStatus } from '@metadata/agents/agent.schema';
 import { getAllResearch, getResearchById, postResearch } from '../services/api';
 import { useAuth } from './useAuth';
 
 /**
- * Hook for generating research
+ * Hook for generating agent tasks
  */
 export function useRequestResearch() {
   const { getAuthToken } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (request: RequestResearchFormInput) => {
+    mutationFn: async (request: RequestAgentTaskFormInput) => {
       const token = await getAuthToken();
       if (!token) {
         throw new Error('No token found');
@@ -21,15 +21,15 @@ export function useRequestResearch() {
       return await postResearch(request, token);
     },
     onSuccess: (data) => {
-      // Add the new research to the cache immediately for optimistic updates
-      if (data && data.researchId) {
-        // Update the specific research query
-        queryClient.setQueryData(['research', data.researchId], data);
+      // Add the new task to the cache immediately for optimistic updates
+      if (data && data.taskId) {
+        // Update the specific task query
+        queryClient.setQueryData(['research', data.taskId], data);
         
-        // Update the all research list if it exists in the cache
-        const allResearch = queryClient.getQueryData<RequestResearchOutput[]>(['allResearch']);
-        if (allResearch) {
-          queryClient.setQueryData(['allResearch'], [data, ...allResearch]);
+        // Update the all tasks list if it exists in the cache
+        const allTasks = queryClient.getQueryData<RequestAgentTaskOutput[]>(['allResearch']);
+        if (allTasks) {
+          queryClient.setQueryData(['allResearch'], [data, ...allTasks]);
         }
       }
     }
@@ -37,7 +37,7 @@ export function useRequestResearch() {
 }
 
 /**
- * Hook for fetching all research
+ * Hook for fetching all agent tasks
  */
 export function useGetAllResearch() {
   const { getAuthToken } = useAuth();
@@ -56,15 +56,15 @@ export function useGetAllResearch() {
 }
 
 /**
- * Hook for fetching a specific research by ID
+ * Hook for fetching a specific agent task by ID
  */
-export function useGetResearchById(researchId?: string) {
+export function useGetResearchById(taskId?: string) {
   const { getAuthToken } = useAuth();
 
   return useQuery({
-    queryKey: ['research', researchId],
+    queryKey: ['research', taskId],
     queryFn: async () => {
-      if (!researchId) {
+      if (!taskId) {
         return null;
       }
 
@@ -72,27 +72,27 @@ export function useGetResearchById(researchId?: string) {
       
       // Add a cache-busting parameter to ensure we don't get cached responses
       const timestamp = new Date().getTime();
-      console.log(`Fetching research ${researchId} at ${timestamp}`);
+      console.log(`Fetching task ${taskId} at ${timestamp}`);
       
-      const response = await getResearchById(researchId, token || undefined);
+      const response = await getResearchById(taskId, token || undefined);
       
       // Return null for not found
       if (!response) {
         return null;
       }
       
-      return response as RequestResearchOutput;
+      return response as RequestAgentTaskOutput;
     },
-    // Add conditional polling for pending research
+    // Add conditional polling for pending tasks
     refetchInterval: (query) => {
-      const data = query.state.data as RequestResearchOutput | null;
+      const data = query.state.data as RequestAgentTaskOutput | null;
       
-      if (data?.researchStatus === ResearchStatus.PENDING) {
+      if (data?.taskStatus === AgentTaskStatus.PENDING) {
         return 5000; // Poll every 5 seconds if pending
       }
       
-      return false; // No polling for completed research
+      return false; // No polling for completed tasks
     },
-    enabled: !!researchId,
+    enabled: !!taskId,
   });
 }

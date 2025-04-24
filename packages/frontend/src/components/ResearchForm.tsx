@@ -27,9 +27,11 @@ export function ResearchForm() {
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['allResearch'] });
         
-        if (data && (data.taskId || data.researchId)) {
-          const id = data.taskId || data.researchId;
-          router.push(`/research/${id}`);
+        if (data && data.taskId) {
+          router.push(`/research/${data.taskId}`);
+        } else if (data && data.researchId) {
+          // For backward compatibility
+          router.push(`/research/${data.researchId}`);
         } else {
           router.push(`/research/`);
         }

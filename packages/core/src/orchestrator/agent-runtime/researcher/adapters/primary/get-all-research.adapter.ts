@@ -17,6 +17,11 @@ import { ValidUser } from '@metadata/saas-identity.schema';
 import { getUserResearchUsecase } from '@agent-runtime/researcher/usecase/get-all-research.usecase';
 import { z } from 'zod';
 import { GetAllUserResearchInput, GetAllUserResearchInputSchema } from '@metadata/agents/research-agent.schema';
+import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
+import { GetAllUserTasksInput } from "@metadata/agents/agent.schema";
+import { HttpResponse } from "@utils/tools/http-status";
+import { SaasIdentity } from "@utils/tools/saas-identity";
+import { agentTaskRepository } from "../secondary/datastore.adapter";
 
 
 /**
@@ -54,4 +59,29 @@ export const getAllUserResearchAdapter = createLambdaAdapter({
   eventParser: getAllResearchEventParser,
   options: getAllUserResearchAdapterOptions,
   responseFormatter: (result) => OrchestratorHttpResponses.OK({ body: result })
-}); 
+});
+
+export const getAllUserTasksAdapter = async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
+  try {
+    const saasIdentity = new SaasIdentity(event);
+    const userId = saasIdentity.getUserId();
+
+    if (!userId) {
+      return HttpResponse.unauthorized("User not authenticated");
+    }
+
+    const input: GetAllUserTasksInput = {
+      userId
+    };
+
+    const tasks = await agentTaskRepository.getAllUserTasks(input);
+    
+    return HttpResponse.ok(tasks);
+  } catch (error) {
+    console.error("Error in getAllUserTasksAdapter:", error);
+    return HttpResponse.internalServerError("Failed to retrieve tasks");
+  }
+};
+
+// For backward compatibility
+export const getAllUserResearchAdapter = getAllUserTasksAdapter;
