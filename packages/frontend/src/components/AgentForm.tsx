@@ -1,0 +1,79 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useRequestTask } from '../hooks/useAgentHooks';
+import { RequestTaskFormInput } from '@metadata/agents/agent.schema';
+import { useQueryClient } from '@tanstack/react-query';
+
+export function AgentForm() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState<Partial<RequestTaskFormInput>>({
+    prompt: '',
+  });
+  
+  const { mutate, isPending, isError, error } = useRequestTask();
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    mutate(formData as RequestTaskFormInput, {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ['allTasks'] });
+        
+        if (data && data.agentId) {
+          router.push(`/agent/${data.agentId}`);
+        } else {
+          router.push(`/agent/`);
+        }
+      }
+    });
+  };
+  
+  return (
+    <div className="bg-bg-secondary p-8 rounded-lg shadow-card border border-border">
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="topic" className="block text-sm font-medium text-fg-secondary mb-1">
+            Task Topic
+          </label>
+          <input
+            type="text"
+            id="topic"
+            name="prompt"
+            value={formData.prompt}
+            onChange={handleChange}
+            required
+            placeholder="Enter a topic for your task"
+            className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary text-fg-primary placeholder-fg-tertiary"
+          />
+        </div>
+        
+        {isError && (
+          <div className="text-error text-sm">
+            Error: {error instanceof Error ? error.message : 'Something went wrong'}
+          </div>
+        )}
+        
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isPending}
+            className={`py-2 px-4 bg-accent-primary text-fg-primary rounded-md font-medium ${
+              isPending ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-90'
+            }`}
+          >
+            {isPending ? 'Processing...' : 'Submit Task'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

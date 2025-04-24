@@ -1,13 +1,13 @@
-export const researchTable = new sst.aws.Dynamo("Research", {
+export const agentTable = new sst.aws.Dynamo("Agent", {
     fields: {
         userId: "string",
-        researchId: "string",
-        researchStatus: "string",
+        agentId: "string",
+        taskStatus: "string",
     },
-    primaryIndex: {hashKey: "researchId"},
+    primaryIndex: {hashKey: "agentId"},
     globalIndexes: {
         UserIdIndex: { hashKey: "userId" },
-        StatusIndex: { hashKey: "researchStatus" }
+        StatusIndex: { hashKey: "taskStatus" }
     }
 })
 

@@ -1,4 +1,4 @@
-import { RequestResearchFormInput, RequestResearchOutput, ResearchStatus } from "@metadata/agents/research-agent.schema";
+import { RequestTaskFormInput, RequestTaskOutput, TaskStatus } from "@metadata/agents/agent.schema";
 import { randomUUID } from "crypto";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
@@ -31,9 +31,9 @@ export const getHeaders = async (token?: string): Promise<HeadersInit> => {
   return headers;
 };
 
-export const getAllResearch = async (token?: string): Promise<RequestResearchOutput[]> => {
+export const getAllTasks = async (token?: string): Promise<RequestTaskOutput[]> => {
   const timestamp = new Date().getTime();
-  const absoluteUrl = await getAbsoluteUrl(`/research?_t=${timestamp}`);
+  const absoluteUrl = await getAbsoluteUrl(`/tasks?_t=${timestamp}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
@@ -41,7 +41,7 @@ export const getAllResearch = async (token?: string): Promise<RequestResearchOut
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch research: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch tasks: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
@@ -58,70 +58,70 @@ export const getAllResearch = async (token?: string): Promise<RequestResearchOut
     }
     
     // If we reach here, the response format was unexpected
-    console.error('Unexpected response format from getAllResearch:', data);
+    console.error('Unexpected response format from getAllTasks:', data);
     return [];
   } catch (error) {
-    console.error('Error fetching all research:', error);
+    console.error('Error fetching all tasks:', error);
     return [];
   }
 }
 
-export const getResearchById = async (researchId: string, token?: string): Promise<RequestResearchOutput | null> => {
+export const getTaskById = async (agentId: string, token?: string): Promise<RequestTaskOutput | null> => {
   const timestamp = new Date().getTime();
-  const absoluteUrl = await getAbsoluteUrl(`/research/${researchId}?_t=${timestamp}`);
+  const absoluteUrl = await getAbsoluteUrl(`/tasks/${agentId}?_t=${timestamp}`);
   try {
     const response = await fetch(absoluteUrl, {
       method: 'GET',
       headers: await getHeaders(token),
     });
     if (!response.ok) {
-      throw new Error(`Failed to fetch deep research: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch task: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
     
     // Log the raw response for debugging
-    console.log('API response for research:', data);
+    console.log('API response for task:', data);
     
     // Handle different response formats
     if (data && typeof data === 'object') {
-      // Check if data is directly the research object
-      if (data.researchId && data.title && data.content) {
-        return data as RequestResearchOutput;
+      // Check if data is directly the task object
+      if (data.agentId && data.title && data.content) {
+        return data as RequestTaskOutput;
       }
       
       // Check if wrapped in data property
       if (data.data && typeof data.data === 'object') {
-        return data.data as RequestResearchOutput;
+        return data.data as RequestTaskOutput;
       }
       
       // Check if wrapped in body property
       if (data.body && typeof data.body === 'object') {
-        return data.body as RequestResearchOutput;
+        return data.body as RequestTaskOutput;
       }
     }
     
     return data;
   } catch (error) {
-    console.error('Error fetching research:', error);
+    console.error('Error fetching task:', error);
     return null;
   }
 }
 
-export const postResearch = async (requestData: RequestResearchFormInput, token: string): Promise<RequestResearchOutput> => {
-  const absoluteUrl = await getAbsoluteUrl('/research');
+export const postTask = async (requestData: RequestTaskFormInput, token: string): Promise<RequestTaskOutput> => {
+  const absoluteUrl = await getAbsoluteUrl('/tasks');
   try {
     // Generate a client-side ID for optimistic updates
     const clientGeneratedId = typeof window !== 'undefined' ? crypto.randomUUID() : randomUUID();
     
-    // Create optimistic research object
-    const optimisticResearch: RequestResearchOutput = {
-      researchId: clientGeneratedId,
+    // Create optimistic task object
+    const optimisticTask: RequestTaskOutput = {
+      agentId: clientGeneratedId,
       userId: '', // Will be filled by the server
-      title: `Research for: ${requestData.prompt.substring(0, 50)}...`,
-      content: 'Researching your topic...',
+      title: `Task for: ${requestData.prompt.substring(0, 50)}...`,
+      content: 'Processing your task...',
       citation_links: [],
-      researchStatus: ResearchStatus.PENDING,
+      taskStatus: TaskStatus.PENDING,
       summary: ''
     };
 
@@ -136,23 +136,23 @@ export const postResearch = async (requestData: RequestResearchFormInput, token:
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
-      throw new Error(`Failed to post research: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(`Failed to post task: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    // Return the server response, which should now be the pending research with the same ID
+    // Return the server response, which should now be the pending task with the same ID
     const serverResponse = await response.json();
     
     // If the server returned a valid response, use it; otherwise, use our optimistic object
     if (serverResponse && 
-        (serverResponse.researchId || 
-         (serverResponse.body && serverResponse.body.researchId) || 
-         (serverResponse.data && serverResponse.data.researchId))) {
+        (serverResponse.agentId || 
+         (serverResponse.body && serverResponse.body.agentId) || 
+         (serverResponse.data && serverResponse.data.agentId))) {
       return serverResponse;
     }
     
-    return optimisticResearch;
+    return optimisticTask;
   } catch (error) {
-    console.error('Error posting research:', error);
+    console.error('Error posting task:', error);
     throw error;
   }
 }

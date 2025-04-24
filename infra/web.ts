@@ -1,5 +1,5 @@
 import { 
-  researchTable, usersTable, userKeysTable
+  agentTable, usersTable, userKeysTable
 } from "./database";
 
 import { clerkClientPublishableKey, clerkClientSecretKey, secrets, stripePublishableKey } from "./secrets";
@@ -8,7 +8,7 @@ import { clerkClientPublishableKey, clerkClientSecretKey, secrets, stripePublish
 export const api = new sst.aws.ApiGatewayV2('BackendApi')
 
 
-const tables = [researchTable, usersTable, userKeysTable]
+const tables = [agentTable, usersTable, userKeysTable]
 
 export const apiResources = [
   ...tables,
@@ -16,20 +16,20 @@ export const apiResources = [
 ]
 
 
-api.route("GET /research", {
+api.route("GET /tasks", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.getAllUserResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getAllUserTasksHandler",
 })
 
-// Add a route for getting a specific research item by ID
-api.route("GET /research/{id}", {
+// Add a route for getting a specific task item by ID
+api.route("GET /tasks/{id}", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.getResearchByIdHandler",
+  handler: "./packages/functions/src/agent-runtime.api.getTaskByIdHandler",
 })
 
-api.route("POST /research", {
+api.route("POST /tasks", {
   link: [...apiResources],
-  handler: "./packages/functions/src/agent-runtime.api.requestResearchHandler",
+  handler: "./packages/functions/src/agent-runtime.api.requestTaskHandler",
 })
 
 
