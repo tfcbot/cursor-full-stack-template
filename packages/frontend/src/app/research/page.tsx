@@ -1,10 +1,10 @@
 import { ResearchList } from '../../components/ResearchList';
 
 export const metadata = {
-  title: 'Your Research - Research Agent',
-  description: 'View all your generated research',
+  title: 'Your Tasks - Agent Platform',
+  description: 'View all your agent tasks',
 };
 
 export default function ResearchPage() {
   return <ResearchList />;
-} 
+}

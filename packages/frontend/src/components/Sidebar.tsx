@@ -22,7 +22,7 @@ export function Sidebar() {
       <div className="p-4 flex items-center justify-between">
         {!isCollapsed && (
           <div className="transition-opacity duration-300">
-            <h1 className="text-xl font-bold">Research Agent</h1>
+            <h1 className="text-xl font-bold">Agent Platform</h1>
           </div>
         )}
         <button 
@@ -44,7 +44,7 @@ export function Sidebar() {
           {isCollapsed ? '📝' : 'Submit Task'}
         </NavLink>
         <NavLink href="/research" active={pathname === '/research'} isCollapsed={isCollapsed}>
-          {isCollapsed ? '🔍' : 'View Research'}
+          {isCollapsed ? '🔍' : 'View Tasks'}
         </NavLink>
       </nav>
 
@@ -103,4 +103,4 @@ function NavLink({
       {children}
     </Link>
   );
-} 
+}
