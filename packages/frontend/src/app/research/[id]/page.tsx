@@ -1,7 +1,9 @@
-import { ResearchDetail } from '../../../components/ResearchDetail';
+import { ResearchDetail } from '@/src/components/ResearchDetail';
 
-export default async function DemoPage({ params }: { params: Promise<{ id: string }> }) {
-  // then get id like this
-  const id = (await params).id;
-  return <ResearchDetail researchId={id} />;
+export default function ResearchDetailPage({ params }: { params: { id: string } }) {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ResearchDetail id={params.id} />
+    </div>
+  );
 }
